@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cart Page - FurniNest</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        .container {
+            margin-top: 50px;
+        }
+        .cart-totals {
+            width: 100%;
+            max-width: 400px;
+            margin-top: 20px;
+            border: 1px solid #ccc;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+        }
+        .cart-totals h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .cart-totals table th,
+        .cart-totals table td {
+            text-align: right;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Partial -->
+    <%- include("../../views/partials/user/header") %>
+
+    <div class="container cart-page" style="margin-top: 80px;">
+        <!-- Cart Product List Section -->
+        <div class="cart-section">
+            <h2>Your Cart</h2>
+            <table class="table table-bordered table-striped">
+                <% if (user && user.cart) { %>
+                    <% if (user.cart.length) { %>
+                        <thead>
+                            <tr>
+                                <th>Image</th>
+                                <th>Name</th>
+                                <th>Price</th>
+                                <th>Discount</th>
+                                <th>Sale Price</th>
+                                <th>Quantity</th>
+                                <th>Sub Total</th>
+                                <th>Stock</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% user.cart.forEach((item, i) => { %>
+                                <tr>
+                                    <td><img src="/uploads/re-image/<%= item.productId.productImage[0] %>" alt="Product Image" width="50"></td>
+                                    <td><%= item.productId.productName %></td>
+                                    <td>Rs. <%= item.productId.regularPrice %></td>
+                                    <td><%= item.productId.productOffer %>%</td>
+                                    <td>Rs. <%= item.productId.salePrice %></td>
+                                    <td class="text-center">
+                                        <div class="detail-qty border radius m-auto">
+                                            <a href="#" onclick="updateQuantity('<%= i %>', 'increase', '<%= item.productId.quantity %>',' <%= item.productId.salePrice %>')">
+                                                <img src="/assets/icons/caret-up.svg" style="width:1rem; height:1rem;">
+                                            </a>
+                                            <span class="qty-val" id="quantity<%= i %>"><%= item.quantity || 1 %></span>
+                                            <a href="#" onclick="updateQuantity('<%= i %>', 'decrease', '<%= item.productId.quantity %>', '<%= item.productId.salePrice %>')">
+                                                <img src="/assets/icons/caret-down.svg" style="width:1rem; height:1rem;">
+                                            </a>
+                                        </div>
+                                        <div id="messageContainer<%= i %>" class="text-center text-danger mt-3"></div>
+                                    </td>
+                                    <td class="text-right">
+                                        <span id="subtotal<%= i %>"><%= (item.productId.salePrice * item.quantity).toFixed(2) %></span>
+                                    </td>
+                                    <td>
+                                        <% if (item.productId.quantity > 0) { %>
+                                            <span class="text-success"><%= item.productId.quantity %> Items In Stock.</span>
+                                        <% } else { %>
+                                            <span class="text-danger">Out of Stock.</span>
+                                        <% } %>
+                                    </td>
+                                    <td><a href="/deleteFromCart?id=<%= item.productId._id %>"><button class="btn btn-danger btn-sm">Remove</button></a></td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    <% } else { %>
+                        <tbody>
+                            <tr>
+                                <td colspan="9" class="text-center">Your cart is empty.</td>
+                            </tr>
+                        </tbody>
+                    <% } %>
+                <% } else { %>
+                    <tbody>
+                        <tr>
+                            <td colspan="9" class="text-center">User cart not found.</td>
+                        </tr>
+                    </tbody>
+                <% } %>
+            </table>
+        </div>
+
+        <!-- JavaScript for Quantity Update -->
+        <script>
+            window.onload=function(){
+                updateTotal()
+            }
+           async function updateQuantity(index, action, maxLimit, salePrice) {
+                const quantityElement = document.getElementById(`quantity${index}`);
+                const subtotalElement = document.getElementById(`subtotal${index}`);
+                const messageContainer = document.getElementById(`messageContainer${index}`);
+
+                let quantity = parseInt(quantityElement.innerText);
+                let message = '';
+
+                if (action === 'increase' && quantity < maxLimit && quantity < 10) {
+                    quantity++;
+                } else if (action === 'decrease' && quantity > 1) {
+                    quantity--;
+                } else {
+                    message = quantity >= maxLimit ? `Only ${maxLimit} items in stock.` : 'Maximum quantity is 10.';
+                }
+                await fetch(`/updateQuantity/${quantity}/${index}/`,{
+                    method:"POST"
+                })
+
+                // Update quantity and subtotal in the DOM
+                quantityElement.innerText = quantity;
+                subtotalElement.innerText = (salePrice * quantity).toFixed(2);
+                updateTotal();
+
+                if (message) {
+                    messageContainer.innerText = message;
+                    setTimeout(() => { messageContainer.innerText = ''; }, 4000);
+                }
+            }
+
+            function updateTotal() {
+                const subtotals = document.querySelectorAll('[id^="subtotal"]');
+                let total = 0, originalTotal = 0, totalDiscount = 0;
+
+                subtotals.forEach((subtotal, index) => {
+                    const quantity = parseInt(document.getElementById(`quantity${index}`).innerText);
+                    const salePrice = parseFloat(subtotal.innerText);
+                    const regularPrice = parseFloat(document.querySelectorAll("td")[2].innerText.replace('Rs.', ''));
+                    total += salePrice;
+                    originalTotal += regularPrice * quantity;
+                    totalDiscount += (regularPrice - salePrice) * quantity;
+                });
+
+                document.getElementById('totalAmount').innerText = total.toFixed(2);
+                document.getElementById('originalTotal').innerText = originalTotal.toFixed(2);
+                document.getElementById('totalDiscount').innerText = totalDiscount.toFixed(2);
+            }
+        </script>
+        <a href="/"> <button  class="btn btn-primary">Continue Shopping</button></a>
+   
+
+        <!-- Cart Totals Section -->
+        <div class="cart-totals">
+            <h2>Cart Totals</h2>
+            <table class="table">
+                <tbody>
+                    <tr><th>Original Total:</th><td><span id="originalTotal"></span></td></tr>
+                    <tr><th>Total Discount:</th><td><span id="totalDiscount"></span></td></tr>
+                    <tr><th>Total:</th><td><span id="totalAmount"></span></td></tr>
+                </tbody>
+            </table>
+            <% if (userCart.cart.length > 0) { %>
+                <a href="/checkOut" class="button button-add-to-cart"> <i class="fi-rs-box-alt mr-10"></i>  <button class="btn btn-success w-100">Proceed to Checkout</button></a>
+            <% } else { %>
+                <a onclick="sweet()" class="button button-add-to-cart"> <i class="fi-rs-box-alt mr-10"></i> <button class="btn btn-success w-100">Proceed to Checkout</button></a>
+            <% } %>
+           
+        </div>
+        <script>
+            function sweet() {
+                Swal.fire({
+                    icon: "error",
+                    title: "Oops...",
+                    text: "Cart is empty",
+                    footer: '<a href="/">Go to Home</a>'
+                });
+            }
+        </script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    </div>
+
+    <!-- Footer Partial -->
+    <%- include("../../views/partials/user/footer") %>
+
+</body>
+</html>

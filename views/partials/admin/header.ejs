@@ -1,0 +1,152 @@
+<div class="wrapper">
+    <!-- Header -->
+    <header class="main-header navbar">
+        <div class="container-fluid d-flex justify-content-between align-items-center">
+            <div class="navbar-brand">
+                <h4 class="text-white">FURNINEST</h4>
+            </div>
+            <div class="col-nav">
+                <ul class="nav">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user"></i> Admin
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="/admin/logout">Logout</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </header>
+
+    <!-- Sidebar -->
+    <aside class="navbar-aside">
+        <nav>
+            <ul>
+                <li class="menu-item">
+                    <a href="/admin/dashboard" class="menu-link active">
+                        <i class="fas fa-tachometer-alt"></i> Dashboard
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="/admin/users" class="menu-link">
+                        <i class="fas fa-users"></i> Customers
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="/admin/category" class="menu-link">
+                        <i class="fas fa-list"></i> Category
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="/admin/brands" class="menu-link">
+                        <i class="fas fa-star"></i> Brands
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="/admin/addProducts" class="menu-link">
+                        <i class="fas fa-plus"></i> Add Product
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="/admin/products" class="menu-link">
+                        <i class="fas fa-box"></i> Products
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="/admin/coupon" class="menu-link">
+                        <i class="fas fa-ticket-alt"></i> Coupons
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="/admin/banner" class="menu-link">
+                        <i class="fas fa-image"></i> Banner
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="/admin/ordersList" class="menu-link">
+                        <i class="fas fa-shopping-cart"></i> Orders
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+</div>
+
+<!-- CSS to make the header sticky and style sidebar -->
+<style>
+    /* Sticky Header */
+    .main-header {
+        background-color: #8da7ab;
+        padding: 10px;
+        height: 60px;
+        width: 100%;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 1000;
+    }
+
+    /* Sidebar */
+    .navbar-aside {
+        background-color: #b0d5de;
+        height: 100vh;
+        width: 250px;
+        position: fixed;
+        top: 60px; /* Pushes the sidebar below the sticky header */
+        left: 0;
+        padding-top: 20px;
+    }
+
+    .menu-item {
+        margin-bottom: 10px;
+    }
+
+    .menu-item a.menu-link {
+        color: #310505;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        font-size: 16px;
+        background-color: #ffffff;
+        padding: 15px;
+        border-radius: 10px;
+        border: 2px solid #6e7e6e;
+        box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .menu-item a.menu-link:hover,
+    .menu-item a.menu-link.active {
+        background-color: #6e7e6e;
+        color: white;
+        border-color: #ffffff;
+    }
+
+    .menu-item i {
+        margin-right: 10px;
+    }
+
+    .dropdown-menu {
+        background-color: #bb9aaf;
+    }
+
+    .dropdown-item:hover {
+        background-color: #33053d;
+        color: white;
+    }
+
+    /* Responsive Sidebar */
+    @media (max-width: 768px) {
+        .navbar-aside {
+            width: 100%;
+            height: auto;
+            position: relative;
+        }
+
+        .main-content {
+            margin-left: 0;
+        }
+    }
+</style>

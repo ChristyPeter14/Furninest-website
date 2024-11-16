@@ -1,0 +1,237 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Order Details - FurniNest Admin</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/16d4885483.js" crossorigin="anonymous"></script>
+    <style>
+        /* Basic page styling */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+
+        .main-wrap {
+            margin-top: 90px; /* Offset for the header height */
+            margin-left: 250px; /* Offset for sidebar width */
+            padding: 20px;
+        }
+
+        /* Header and title styling */
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+
+        .content-header h2 {
+            margin: 0;
+            font-size: 24px;
+            color: #333;
+        }
+
+        .card {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        /* Order info styling */
+        .order-info-wrap {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .icontext {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .icontext h6 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        /* Table styling */
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .table thead {
+            background-color: #f1f1f1;
+        }
+
+        .table th, .table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .table th {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        /* Status label styling */
+        .text-success {
+            color: green;
+        }
+
+        .text-danger {
+            color: red;
+        }
+
+        /* Footer styling */
+        footer {
+            padding: 10px;
+            text-align: center;
+            font-size: 12px;
+            color: #777;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            border: none;
+            color: white;
+            padding: 8px 12px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .order-info-wrap {
+                flex-direction: column;
+            }
+
+            .main-wrap {
+                margin-left: 0; /* No offset for sidebar on smaller screens */
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header and Sidebar -->
+    <%- include("../../views/partials/admin/header") %>
+    
+    <main class="main-wrap">
+        <!-- Content Section -->
+        <section class="content-main">
+            <div class="content-header">
+                <h2>Order Detail</h2>
+                <p>Order ID: <%= order.orderId %></p>
+            </div>
+
+            <div class="card">
+                <header class="card-header">
+                    <p><strong>Date:</strong> <%= order.orderDate %></p>
+                    <p><strong>Order ID:</strong> ORD<%= order.orderId %></p>
+                </header>
+
+                <div class="card-body">
+                    <div class="order-info-wrap">
+                        <!-- Customer Information -->
+                        <div class="icontext">
+                            <span class="icon">&#128100;</span>
+                            <div>
+                                <h6>Customer</h6>
+                                <p><%= order.userId.name %> <br><%= order.userId.mobile %></p>
+                            </div>
+                        </div>
+                        
+                        <!-- Payment Information -->
+                        <div class="icontext">
+                            <span class="icon">&#128179;</span>
+                            <div>
+                                <h6>Payment Info</h6>
+                                <p>Method: <%= order.paymentMethod %> <br>
+                                Status: <span class="<%= order.paymentStatus === 'Success' ? 'text-success' : 'text-danger' %>"><%= order.paymentStatus %></span></p>
+                            </div>
+                        </div>
+
+                        <!-- Shipping Information -->
+                        <div class="icontext">
+                            <span class="icon">&#128205;</span>
+                            <div>
+                                <h6>Deliver To</h6>
+                                <p><%= order.shippingAddress.housename %> <br>
+                                <%= order.shippingAddress.city %>, <%= order.shippingAddress.state %> <br>
+                                <%= order.shippingAddress.pincode %></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Products Table -->
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>   
+                                <tr>
+                                    <th>Product</th>
+                                    <th>MRP</th>
+                                    <th>Unit Price</th>
+                                    <th>Quantity</th>
+                                    <th class="text-end">Total</th>
+                                    <th>Status</th>
+                                    <th>Change Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% for (let i = 0; i < order.products.length; i++) { %>
+                                    <tr>
+                                        <td><%= order.products[i].productId.productName %></td>
+                                        <td>₹<%= order.products[i].productId.regularPrice %></td>
+                                        <td>₹<%= order.products[i].productId.salePrice %></td>
+                                        <td><%= order.products[i].quantity %></td>
+                                        <td class="text-end">₹<%= order.products[i].productId.salePrice * order.products[i].quantity %></td>
+                                        <td><span class="<%= order.products[i].status === 'Delivered' ? 'text-success' : 'text-danger' %>"><%= order.products[i].status %></span></td>
+                                        <td>
+                                            <form action="/admin/updateOrderStatus" method="post">
+                                                <input type="hidden" name="orderId" value="<%= order._id %>">
+                                                <input type="hidden" name="productId" value="<%= order.products[i].productId._id %>">
+                                                <select name="status">
+                                                    <option value="Order Placed">Order Placed</option>
+                                                    <option value="Shipped">Shipped</option>
+                                                    <option value="Delivered">Delivered</option>
+                                                    <option value="Cancelled">Cancelled</option>
+                                                    <option value="Returned">Returned</option>
+                                                </select>
+                                                <button type="submit" class="btn-primary">Save</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

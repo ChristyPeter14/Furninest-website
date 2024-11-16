@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Brands</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/16d4885483.js" crossorigin="anonymous"></script>
+    <style>
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+            background-color: #f7f7f7;
+            min-height: 100vh;
+            margin-top: 60px; /* Adjust to push below the header */
+        }
+
+        .form-section, .table-section {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-section {
+            margin-bottom: 20px;
+        }
+
+        .form-section input[type="text"], .form-section input[type="file"] {
+            border: 2px solid #6e7e6e;
+            border-radius: 5px;
+        }
+
+        .form-section button {
+            background-color: #8da7ab;
+            color: white;
+            border-radius: 5px;
+        }
+
+        .table thead th {
+            background-color: #f5f5f5;
+        }
+
+        .table img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .badge-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .badge-success {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .table-buttons a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .table-buttons button {
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Include Header-Sidebar Partial -->
+    <%- include('../../views/partials/admin/header') %>
+
+    <main class="main-content">
+        <div class="container">
+            <div class="row">
+                <!-- Left Side: Add Brand Section -->
+                <div class="col-md-4">
+                    <div class="form-section">
+                        <h4 class="mb-4">Add Brand</h4>
+                        <form method="post" action="/admin/addBrand" enctype="multipart/form-data">
+                            <div class="mb-3">
+                                <label for="brandName" class="form-label">Brand Name</label>
+                                <input type="text" class="form-control" id="brandName" name="name" placeholder="Enter brand name" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="brandImage" class="form-label">Brand Image</label>
+                                <input type="file" class="form-control" id="brandImage" name="image" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">Add Brand</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Right Side: Brand List Table Section -->
+                <div class="col-md-8">
+                    <div class="table-section">
+                        <h4 class="mb-4">Brand List</h4>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Brand</th>
+                                        <th>Logo</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <%data.reverse().forEach((brand,index)=>{%>
+                                    <tr>
+                                        <td><%=brand.brandName%></td>
+                                        <td><img src="/uploads/re-image/<%=brand.brandImage[0]%>" alt="<%=brand.brandName%>"></td>
+                                        <td>
+                                            <%if(brand.isBlocked===true){%>
+                                            <span class="badge badge-danger">Blocked</span>
+                                            <%}else{%>
+                                            <span class="badge badge-success">Active</span>
+                                            <%}%>
+                                        </td>
+                                        <td class="table-buttons">
+                                            <%if(brand.isBlocked===false){%>
+                                            <button class="btn btn-danger btn-sm">
+                                                <a href="/admin/blockBrand?id=<%=brand._id%>">Block</a>
+                                            </button>
+                                            <%}else{%>
+                                            <button class="btn btn-success btn-sm">
+                                                <a href="/admin/unBlockBrand?id=<%=brand._id%>">Unblock</a>
+                                            </button>
+                                            <%}%>
+
+                                            <button class="btn btn-danger btn-sm" onclick="return confirmDelete()">
+                                                <a href="/admin/deleteBrand?id=<%=brand._id%>">Delete</a>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                   <%})%>
+                                 
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        function confirmDelete(){
+            return confirm("Are you sure you want to delete this brand")
+        }
+    </script>
+</body>
+</html>
+ 

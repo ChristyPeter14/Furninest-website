@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.14.2/dist/sweetalert2.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <style>
+        /* Style adjustments for a small search bar and responsive table */
+        .container{
+            margin-top: 90px;
+            margin-left: 210px;
+        }
+        .table-responsive {
+            margin-top: 20px;
+            overflow-x: auto;
+        }
+
+        .table th, .table td {
+            text-align: center;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+
+        .table th {
+            font-size: 14px;
+        }
+
+        .table td {
+            font-size: 13px;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .search-bar-container {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            margin-bottom: 15px;
+            margin-left: 100px;
+        }
+
+        .search-bar-container input {
+            width: 200px;
+            margin-right: 10px;
+        }
+
+        .btn-sm {
+            padding: 4px 10px;
+            font-size: 12px;
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .btn-offer {
+            margin-right: 5px;
+        }
+
+        .btn-block, .btn-unblock {
+            margin-right: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .table th, .table td {
+                font-size: 12px;
+            }
+
+            .table td .btn-sm {
+                padding: 3px 8px;
+            }
+        }
+        .pagination {
+            margin-top: 20px;
+            justify-content: center;
+        }
+
+        .pagination .page-item.active .page-link {
+            background-color: #6e7e6e; /* Active color */
+            border-color: #6e7e6e;
+            color: white;
+        }
+
+        .pagination .page-item .page-link {
+            border-radius: 50%; /* Round pagination */
+            margin: 0 5px;
+        }
+
+        .pagination .page-link {
+            color: #310505; /* Default link color */
+            transition: background-color 0.3s, color 0.3s;
+            text-decoration: none;
+        }
+
+        .pagination .page-link:hover {
+            background-color: #310505; /* Hover background */
+            color: white; /* Hover text color */
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Partial -->
+
+    <%- include("../../views/partials/admin/header") %>
+    <div class="container">
+        <div class="search-bar-container">
+            <input type="text" class="form-control form-control-sm" placeholder="Search product..." id="searchInput">
+            <button class="btn btn-primary btn-sm" onclick="searchProduct()">Search</button>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-striped table-hover table-bordered">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Product Name</th>
+                        <th>Brand</th>
+                        <th>Category</th>
+                        <th>Sale Price</th>
+                        <th>Offer Price</th>
+                        <th>Offer</th>
+                        <th>Quantity</th>
+                        <th>Action</th>
+                        <th>Edit</th>
+                    </tr>
+                </thead>
+                <tbody id="productTableBody">
+                    <%for(let i=data.length-1;i>=0;i--){%>
+                    <tr>
+                        <td><%=data[i].productName%></td>
+                        <td><%=data[i].brand%></td>
+                        <td><%=data[i].category.name%></td>
+                        <td><%=data[i].salePrice%></td>
+                        <td>
+                            <%if(locals.data[i].productOffer){%>
+                                <%=data[i].productOffer%>
+                                <%}else{%>
+                                    0%
+                                    <%}%>
+                        </td>
+                        <td>
+                            <%if(locals.data[i].productOffer===0){%>
+                            <button class="btn btn-sm btn-success btn-offer" onclick="addOffer('<%=data[i]._id%>')">Add Offer</button>
+                            <%}else{%>
+                            <button class="btn btn-sm btn-danger btn-offer" onclick="removeOffer('<%=data[i]._id%>')">Remove Offer</button>
+                            <%}%>
+                        </td>
+                        <td><%=data[i].quantity%></td>
+
+                        <td class="action-buttons">
+                            <%if(data[i].isBlocked===false){%>
+                            <button class="btn btn-sm btn-danger btn-block"  >
+                                <a href="/admin/blockProduct?id=<%=data[i]._id%>" class="text-white" style="text-decoration: none;"  >Block</a>
+                            </button>
+                            <%}else{%>
+                            <button class="btn btn-sm btn-success btn-unblock ">
+                                <a href="/admin/unblockProduct?id=<%=data[i]._id%>" class="text-white" style="text-decoration: none;" > Unblock</a>
+                            </button>
+                            <%}%>
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-primary">
+                                <a href="/admin/editProduct?id=<%=data[i]._id%>"  class="text-white" style="text-decoration: none;" >Edit</a>
+                            </button>
+                        </td>
+                    </tr>
+                 <%}%>
+                </tbody>
+            </table>
+        </div>
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                <% for(let i = 1; i <= totalPages; i++) { %>
+                    <li class="page-item <%= (i === currentPage) ? 'active' : '' %>">
+                        <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+                    </li>
+                <% } %>
+            </ul>
+        </nav>
+      
+    </div>
+
+    <!-- Footer Partial -->
+  
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        
+        async function addOffer(productId) {
+            const {value:amount}=await Swal.fire({
+                title:'Offer in percentage',
+                input:'number',
+                inputLabel:'percentage',
+                inputPlaceholder:'%',
+            })
+            $.ajax({
+                url:"/admin/addProductOffer",
+                method:"POST",
+                data:{
+                    percentage:amount,
+                    productId:productId,
+
+                },
+                success:(response)=>{
+                    if(response.status===true){
+                        location.reload()
+                        Swal.fire('Offer added','The offer has been removed','success')
+                    }else{
+                        alert("failed")
+                    }
+                }
+            })
+        }
+       function removeOffer(productId){
+        try {
+            Swal.fire({
+                title:"Remove offer",
+                text:'Are you sure you want to remove this offer',
+                icon:'warning',
+                showCancelbutton:true,
+                confirmButton:'#3085d6',
+                cancelButtonColor:'d33',
+                confirmButtonText:'Yes remove it',
+                timer:5000,
+                timerProgressBar:true
+            }).then(async(result)=>{
+                if(result.isConfirmed){
+                    $.ajax({
+                        url:"/admin/removeProductOffer",
+                        method:"post",
+                        data:{
+                            productId:productId,
+
+                        },
+                        success:(response)=>{
+                            if(response.status===true){
+                                Swal.fire('Removed!','The offer has been removed','success')
+                                location.reload()
+                            }else if(response.status===false){
+                                Swal.fire('failed')
+                            }else{
+                                alert('failed')
+                            }
+                        }
+                    })
+                }
+            })
+        } catch (error) {
+            console.error(error)
+        }
+       }
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,153 @@
+<%-include("../../views/partials/user/header")%>
+
+
+<!-- Breadcrumb -->
+<nav class="main-Shop" aria-label="breadcrumb">
+    <ol class="breadcrumb bg-light py-3 px-4">
+        <li class="breadcrumb-item"><a href="/" class="fw-bold text-primary">Home</a></li>
+        <li class="breadcrumb-item active text-secondary" aria-current="page"><span class="fw-semibold">Shop</span></li>
+    </ol>
+</nav>
+
+<!-- Shop Page Layout -->
+<div class="container my-4"style="border-radius: 15px;" >
+    <div class="row" style="border-radius: 15px;">
+        <!-- Sidebar for Sort By and Category Filter -->
+        <div style="margin-top: 20px; " class="col-md-3 mb-4">
+            <!-- Sort By Section -->
+            <h4 style="margin-top: 50px; margin-left: 90px; color: black; font-size: 30px;" class="mb-3">Sort By</h4>
+            <!-- <div class="d-grid gap-2">
+                <button class="btn btn-outline-secondary" onclick="updateSort('atoz')">A to Z</button>
+                <button class="btn btn-outline-secondary" onclick="updateSort('ztoa')">Z to A</button>
+                <button class="btn btn-outline-secondary"  onclick="updateSort('newarrival')">New Arrivals</button>
+                <button class="btn btn-outline-secondary" onclick="updateSort('popular')">Popularity</button>
+                <button class="btn btn-outline-secondary"  onclick="updateSort('rating')">Rating</button>
+                <button class="btn btn-outline-secondary" onclick="updateSort('featured')">Featured</button>
+                <button class="btn btn-outline-secondary" onclick="updateSort('ascending')">Low Price</button>
+                <button class="btn btn-outline-secondary"  onclick="updateSort('descending')">High Price</button>
+            </div> -->
+            <div class="d-grid gap-2">
+              <button class="btn btn-outline-secondary" onclick="location.href='/shop?sort=atoz&categoryId=<%= categoryId %>&search=<%= search %>'">A to Z</button>
+              <button class="btn btn-outline-secondary" onclick="location.href='/shop?sort=ztoa&categoryId=<%= categoryId %>&search=<%= search %>'">Z to A</button>
+              <button class="btn btn-outline-secondary" onclick="location.href='/shop?sort=newarrival&categoryId=<%= categoryId %>&search=<%= search %>'">New Arrivals</button>
+              <button class="btn btn-outline-secondary" onclick="location.href='/shop?sort=popular&categoryId=<%= categoryId %>&search=<%= search %>'">Popularity</button>
+              <button class="btn btn-outline-secondary" onclick="location.href='/shop?sort=rating&categoryId=<%= categoryId %>&search=<%= search %>'">Rating</button>
+              <button class="btn btn-outline-secondary" onclick="location.href='/shop?sort=ascending&categoryId=<%= categoryId %>&search=<%= search %>'">Low Price</button>
+              <button class="btn btn-outline-secondary" onclick="location.href='/shop?sort=descending&categoryId=<%= categoryId %>&search=<%= search %>'">High Price</button>
+          </div>
+          
+
+            <!-- Category Filter Section -->
+            <!-- <h4 class="mt-5 mb-3 text-center">Category Filter</h4>
+            <div class="d-grid gap-2">
+              <% for(let i = 0; i < categories.length; i++) { %>
+                 <button class="btn btn-outline-secondary" 
+                         onclick="location.href='/shop?categoryId=<%= categories[i]._id %>&sort=<%= sort %>&search=<%= search %>'">
+                     <%= categories[i].name %>
+                 </button>
+              <% } %>
+          </div> -->
+            
+        </div>
+
+        <script>
+
+        </script>
+
+     
+        <div class="col-md-9">
+           
+            <div class="mb-4" style="margin-top: 10px;">
+              <div class="input-group">
+                  <input type="text" class="form-control rounded-pill" placeholder="Search products..." aria-label="Search" value="<%= search %>">
+                  <button style="margin-top: 10px;" class="btn btn-primary rounded-pill ms-2" onclick="productSearch()">Search</button>
+                  <button style="margin-top: 10px;" class="btn btn-secondary rounded-pill ms-2" onclick="clearSearch()">Clear</button>
+              </div>
+          </div>
+
+
+          <script>
+            function productSearch() {
+                const searchValue = document.querySelector('input[placeholder="Search products..."]').value;
+                const urlParams = new URLSearchParams(window.location.search);
+                urlParams.set('search', searchValue);
+                window.location.search = urlParams.toString();
+            }
+        
+            function clearSearch() {
+                const urlParams = new URLSearchParams(window.location.search);
+                urlParams.delete('search');
+                window.location.search = urlParams.toString();
+            }
+        </script>
+
+           
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+              <% for (let i = 0; i < products.length; i++) { %>
+                <div class="col">
+                  <div class="card-shop" style="width: 15rem;">
+                    <div class="product-img-container">
+                      <img src="/uploads/re-image/<%=products[i].productImage[0]%>" class="card-img-top product-img" alt="<%=products[i].productName%>">
+                    </div>
+                    <div class="card-body-shop">
+                      <h5 class="card-title" style="margin-left: 10px;margin-top: 10px;"><%=products[i].productName%></h5>
+                      <div class="star-rating" id="ratingStars">
+                        <%if(products[i].rating!=null){%>
+                          <div class="star-rating" id="ratingStars" style="margin-left: 10px;" >
+                            <%for(let j=1;j<=5;j++){%>
+                            <%if(j<=products[i].rating){%>
+                              <i class="fa fa-star" style="color: gold;"></i>
+                              <%}else{%>
+                              <i class="fa fa-star" style="color:lightgray;"></i> 
+                            <%}%>
+                            <%}%>
+                          </div>
+                        <%}%>
+                      </div>
+                      <p class="card-text" style="margin-left: 10px;">Rs. <%=products[i].salePrice%> <span class="text-muted text-decoration-line-through">Rs. <%=products[i].regularPrice%></span> <span class="text-danger">(<%=products[i].productOffer%> %)</span></p>
+                      <p class="card-text"style="margin-left: 10px;">Rs. <%=products[i].salePrice%></p>
+                      <p><%=products[i].category.name%></p>
+
+                      <%if(products[i].quantity<=5){%>
+                      <p style="margin-left: 10px; color: red;"> Limited Stocks. Only <span class="text-danger"> <strong><%=products[i].quantity%> </strong></span>left</p>
+                      <%}else{%>
+                        <p style="margin-left: 10px;">Avalilable Stocks: <span class="text-success"><%=products[i].quantity%></span></p>
+                      <%}%>
+
+                      <a href="/productDetails?id=<%=products[i]._id%>" class="btn btn-primary">Shop Now</a>
+                    </div>
+                  </div>
+                </div>
+              <% } %>
+            </div>
+            <nav aria-label="Page navigation" style="margin-top: 30px;">
+              <ul class="pagination justify-content-center">
+                 
+                  <li class="page-item <%= current == 1 ? 'disabled' : '' %>">
+                      <a class="page-link" href="?page=<%= current - 1 %>" tabindex="-1" aria-disabled="<%= current == 1 %>">Back</a>
+                  </li>
+          
+                 
+                  <% for (let i = 1; i <= pages; i++) { %>
+                      <li class="page-item <%= current == i ? 'active' : '' %>">
+                          <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+                      </li>
+                  <% } %>
+          
+                  <li class="page-item <%= current == pages ? 'disabled' : '' %>">
+                      <a class="page-link" href="?page=<%= nextpage %>" aria-disabled="<%= current == pages %>">Next</a>
+                  </li>
+              </ul>
+          </nav>
+          
+              
+
+               
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include("../../views/partials/user/footer") %>
+
+  

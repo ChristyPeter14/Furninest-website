@@ -1,0 +1,154 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #ffe9c9;
+}
+
+/* Navbar */
+.navbar {
+    background-color: #d25620;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    width: 100%;
+}
+
+.navbar-nav .nav-link {
+    color: #fff !important;
+}
+
+.navbar-nav .nav-link:hover {
+    color: #f7ca18 !important;
+}
+
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+/* Banner */
+.banner {
+    background-image: url(/images/banner.jpg);
+    background-size: cover;
+    background-position: center;
+    height: 500px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* color: white; */
+    text-align: center;
+}
+
+.banner-text h1 {
+    font-size: 3rem;
+    font-weight: bold;
+    color: rgb(255, 255, 255);
+    margin-top: 250px;
+
+}
+
+.banner-text p {
+    font-size: 1.2rem;
+    margin-top: 10px;
+    color: white;
+}
+
+/* Product section */
+.card {
+    border:black;
+    border-style: solid;
+    transition: transform 0.2s;
+
+    margin-left: 100px;
+    margin-top: 20px;
+    
+}
+.images{
+    margin-top: 10px;
+}
+.card:hover {
+    transform: scale(1.05);
+}
+.atag{
+    text-decoration: none;
+    color: rgb(15, 25, 224);
+}
+
+.btn-primary {
+    background-color: #343a40;
+    border: none;
+    margin-left: 50px;
+}
+
+.btn-primary:hover {
+    background-color: #f7ca18;
+}
+
+/* Footer */
+footer {
+    background-color: #343a40;
+}
+
+footer a {
+    text-decoration: none;
+}
+
+footer a:hover {
+    color: #f7ca18;
+}
+.container {
+
+    margin-top: 20px;
+    margin-left: 100px;
+    background-color: rgb(255, 255, 255);
+   
+    justify-content:space-between;
+  
+}
+.pagination1{
+    margin-top: 50px;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+}
+
+.category-img {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border: 3px solid #ddd;
+    padding: 10px;
+}
+
+
+/* shop page */
+.main-Shop{
+    margin-top: 60px;
+}
+.product-img-container {
+    overflow: hidden;
+    border-radius: 8px; /* Optional: to give the image container rounded corners */
+}
+
+.product-img {
+    transition: transform 0.9s ease-in-out;
+}
+
+.product-img-container:hover .product-img {
+    transform: scale(1.1); /* Zoom effect */
+}
+.row{
+    background-color: #f8f8f8;
+}
+.card-shop{
+    background-color: #f7f5ed;
+    margin-left: 20px;
+    border: black;
+    border-radius: 8px;
+    margin-top: 30px;
+    border:rgb(243, 239, 215);
+    border-style:dashed;
+    
+}
+.btn {
+    margin-bottom: 20px;
+}
