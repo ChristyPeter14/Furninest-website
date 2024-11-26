@@ -34,6 +34,14 @@ router.get("/auth/google",passport.authenticate("google",{scope:['profile','emai
 router.get("/auth/google/callback",passport.authenticate('google',{failureRedirect:"/signup"}),(req,res)=>{
     res.redirect("/")
 })
+//forgot password
+
+router.get('/forgot_password',userController.getForgotPassword)
+router.post('/forgot-email-valid',userController.forgotEmailValid)
+router.post('/verify-forgot-otp',userController.verifyForgotPassOtp)
+router.get('/reset-password',userController.getResetPassPage)
+router.post('/resend-forgot-otp',userController.resendForgotOtp)
+router.post('/resetPassword',userController.postNewPassword)
 
 
 //my account 
@@ -79,6 +87,7 @@ router.post('/createProductReview',userAuth,orderController.createProductReview)
 //Razorpay
 router.post("/onlinePayment",userAuth,orderController.onlinePayment)
 router.get('/onlinepayment',userAuth,orderController.paymentSuccess)
+router.post('/handlePaymentFailure',userAuth,orderController.handlePaymentFailure)
 
 
 //wishlist
@@ -98,6 +107,16 @@ router.get('/deleteCoupon',userAuth,userCouponController.deleteAppliedCoupon)
 router.get('/wallet',userAuth,orderController.getWallet)
 router.get('/walletPayment',userAuth,orderController.walletPayment)
 router.get('/walletChecking',userAuth,orderController.walletChecking)
+
+//repayment
+
+router.get('/payment',userAuth,orderController.initiatePayment)
+router.get('/walletRepayment',userAuth,orderController.walletRepayment)
+router.post('/onlineRepayment',userAuth,orderController.onlineRepayment)
+router.get('/onlineRepayment',userAuth,orderController.repaymentSuccess)
+router.post('/placeReOrder',userAuth,orderController.placeReorder)
+
+ 
 
 
 

@@ -479,7 +479,7 @@ const onlinePayment=async(req,res)=>{
             instance.orders.create(options,async function(err,razorOrder){
                 if(err){
                     console.log(err.message)
-                    res.staus(500).json({error:"Failed to create order"})
+                    res.status(500).json({error:"Failed to create order"})
                 }else{
                     res.status(200).json({
                         message:"Order placed successfully",
@@ -1034,7 +1034,9 @@ const handlePaymentFailure=async(req,res)=>{
         let originalTotal=0
         let discountTotal=0
 
-        userData.forEach(product=>{
+        userData.cart.forEach((product)=>{
+            console.log("user data 1");
+            
             const originalPrice=product.productId.regularPrice*product.productId.quantity
             const salePrice=product.productId.salePrice*product.productId.quantity
             const discountAmount=originalPrice-salePrice
@@ -1145,7 +1147,8 @@ const handlePaymentFailure=async(req,res)=>{
             if(orderData){
                 userData.cart=[]
                 await userData.save()
-                res.redirect('/orderDetails')
+                console.log('redirecting to show order page')
+                res.redirect('/showOrder')
             }
         }
 
@@ -1166,10 +1169,14 @@ const handlePaymentFailure=async(req,res)=>{
 const initiatePayment=async(req,res)=>{
     try {
         const orderId=req.query.orderId
+        console.log('order id in initiate payment: ',orderId)
         const orderData=await Order.findById({_id:orderId}).populate('products.productId').populate('userId')
+        console.log("orderData: ",orderData)
         const {email}=req.session.user
         const brands=await Brand.find({isBlocked:false})
         const userData=await User.findOne({email:email}).populate('cart.productId')
+        console.log('user data: ',userData);
+        
         const coupon=await Coupon.find({is_active:true,"redeemedUsers.userId":{$ne:userData._id}})
         const categories=await Category.find({isListed:true})
 
@@ -1194,7 +1201,40 @@ const initiatePayment=async(req,res)=>{
 
 
             //delivery charge
+            const totalAmountAfterDiscount=originalTotal-discountTotal
+            if(totalAmountAfterDiscount<1000){
+                deliveryCharge=100
+            }else if(totalAmountAfterDiscount>=1000&&totalAmountAfterDiscount<=5000){
+                deliveryCharge=50
+            }
 
+            //disabling cash on delivery
+
+            if(originalTotal-discountTotal>1000){
+                isCodDisabled=true
+            }
+
+            //final amount
+            const finalAmount=totalAmountAfterDiscount+deliveryCharge
+
+            return res.render('payment',{
+                user:userData,
+                categories,
+                brands,
+                originalTotal:originalTotal.toFixed(2),
+                discountTotal:discountTotal.toFixed(2),
+                totalDiscountPercentage:totalDiscountPercentage.toFixed(2),
+                isCodDisabled,
+                deliveryCharge:deliveryCharge.toFixed(2),
+                finalAmount:finalAmount.toFixed(2),
+                orderId:orderId,
+                totalAmount:finalAmount.toFixed(2),
+                orderData,
+                addresses,
+                coupon
+
+            })
+          
             
 
         }
@@ -1204,6 +1244,174 @@ const initiatePayment=async(req,res)=>{
     }
 }
 
+const onlineRepayment =async(req,res)=>{
+    try {
+        console.log("i am in order repayment ")
+        let totalAmount=parseFloat(req.query.totalAmount)
+        let couponCode=req.session.couponCode
+        let couponData=await Coupon.findOne({couponCode:couponCode})
+        let {email}=req.session.user
+        const userData=await User.findOne({email:email}).populate('cart.productId')
+
+        let flag=0
+
+        let coupon=null
+        if(couponData){
+            totalAmount-=couponData.discount
+            totalAmount=parseFloat(totalAmount.toFixed(2))
+            coupon=couponData.discount
+
+        }
+
+        //calculating the delivery charge
+
+        let deliveryCharge=0
+        if(totalAmount<1000){
+            deliveryCharge=100
+        }else if(totalAmount>=1000&&totalAmount<=5000){
+            deliveryCharge=50
+        }
+
+        totalAmount+=deliveryCharge
+        totalAmount=parseFloat(totalAmount.toFixed(2))
+
+
+        var options={
+            amount:totalAmount*100,
+            currency:"INR",
+             receipt:"order_rcptid_11"
+        }
+        if(flag==0){
+            instance.orders.create(options,async function(err,razorOrder){
+                if(err){
+                    console.log(err.message)
+                    res.status(500).json({error:"Failed to create order"})
+                }else{
+                    res.status(200).json({
+                        message:"Order placed successfully",
+                        razorOrder:razorOrder,
+                        paymentStatus:"Successfull"
+                    })
+                }
+            })
+        }
+
+
+    } catch (error) {
+        console.error(error)
+        
+        
+    }
+}
+
+const mongoose = require('mongoose');
+const repaymentSuccess=async(req,res)=>{
+    try {
+      console.log("i am in repayment success ")
+    const {email}=req.session.user
+    console.log("repayment email: ",email)
+    const userData=await User.findOne({email:email}).populate('cart.productId')
+    let totalAmount=req.query.totalAmount
+    console.log('total amount: ',totalAmount)
+    const couponCode=req.query.couponCode
+    const paymentMethod='Razorpay'
+    const OrderId=req.query.orderId
+    console.log("orderId :, ",OrderId)
+    const orderData=await Order.findById({_id:OrderId}).populate('products.productId').populate('userId')
+    console.log('orderdata: ',orderData)
+    
+    await Order.findByIdAndUpdate({_id:OrderId},{$set:{paymentStatus:"Success"}})
+    res.redirect('/showOrder')
+    } catch (error) {
+        console.log(error.message)
+        
+    }
+}
+const placeReorder = async (req, res) => {
+    try {
+        console.log("I am in reorder");
+
+        // Log the query object for debugging
+        console.log("req.query:", req.query);
+
+        const orderId = req.query.orderId;
+        if (!orderId) {
+            console.log("Error: Missing orderId in query parameters");
+            return res.status(400).send("Order ID is required");
+        }
+
+        console.log("orderId:", orderId);
+
+        // Fetch order and user data
+        const orderData = await Order.findById(orderId)
+            .populate('products.productId')
+            .populate('userId');
+
+        if (!orderData) {
+            console.log("Error: Order not found");
+            return res.status(404).send("Order not found");
+        }
+
+        const { email } = req.session.user;
+        const userData = await User.findOne({ email }).populate('cart.productId');
+
+        if (!userData) {
+            console.log("Error: User not found");
+            return res.status(404).send("User not found");
+        }
+
+        // Update payment method
+        await Order.findByIdAndUpdate(
+            orderId,
+            { $set: { paymentMethod: "Cash on Delivery" } }
+        );
+
+        console.log("Order updated successfully");
+        res.redirect('/orderDetails');
+    } catch (error) {
+        console.error("Error in placeReorder:", error.message);
+
+        if (error.name === 'CastError') {
+            res.status(400).send("Invalid order ID format");
+        } else {
+            res.status(500).send("Internal server error");
+        }
+    }
+};
+
+
+
+
+
+const walletRepayment=async(req,res)=>{
+    try {
+        console.log('i am in wallet repayment ')
+        const {email}=req.session.user
+        console.log("wallet repayment email: ",email)
+        const userData=await User.findOne({email:email}).populate('cart.productId')
+        const orderId=req.query.orderId
+        console.log("orderId: ",orderId)
+        const orderData=await Order.findById({_id:orderId}).populate('products.productId').populate('userId')
+
+
+        const totalAmount=orderData.totalAmount
+        console.log('total amount: ',totalAmount);
+        
+        await Order.findByIdAndUpdate(
+            {_id:orderId},
+            {$set:{paymentStatus:"Success",paymentMethod:"Wallet"}}
+        )
+
+        // wallet updation after wallet repayment
+        userData.wallet-=totalAmount
+        await userData.save()
+
+        res.redirect('/showOrder')
+    } catch (error) {
+        console.log(error.message)
+
+    }
+}
 
 
 
@@ -1224,7 +1432,13 @@ module.exports={
     createProductReview,
     getWallet,
     walletPayment,
-    walletChecking
+    walletChecking,
+    handlePaymentFailure,
+    initiatePayment,
+    onlineRepayment,
+    repaymentSuccess,
+    placeReorder,
+    walletRepayment
 
     
 }

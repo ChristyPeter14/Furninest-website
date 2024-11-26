@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
     <style>
         /* General Styles */
@@ -379,135 +380,10 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
 
-    <script>
-          document.addEventListener("DOMContentLoaded", function () {
-                        document.querySelectorAll('input[name="selectAddress"]').forEach(function (radio) {
-                            radio.addEventListener('change', function () {
-                                document.getElementById('selected-address-id').value = this.value; // Update the hidden input value
-                            });
-                        });
-                    });
 
-                    var addressIndex = document.getElementById('selectAddress').value;
-                    var totalAmount = document.getElementById('totalAmount').value;
-                    var couponCode = document.getElementById('coupon-entered').value;
-                    console.log('Total Amount:', totalAmount);
-                    console.log('COUPON CODE:', couponCode);
-
-                    document.addEventListener("DOMContentLoaded", function () {
-                        const requestOptions = {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                            },
-                            body: JSON.stringify({
-                                totalAmount: totalAmount,
-                                couponCode: couponCode
-                            }),
-                        };
-
-                        let rzp1;
-
-                        function initiatePayment(orderId, paymentStatus, addressId) {
-                            let couponCode = document.getElementById('coupon-entered').value;
-                            const orderID = orderId.id;
-
-                            var options = {
-                                key: "rzp_test_oR41Sy5Sd549rm",
-                                amount: orderId.amount,
-                                currency: "INR",
-                                name: "FurniNest",
-                                description: "Test Transaction",
-                                order_id: orderID,
-                                handler: function (response) {
-                                    if (response.razorpay_payment_id) {
-                                        Swal.fire({
-                                            icon: 'success',
-                                            title: 'Order Placed',
-                                            text: 'Thank you for your purchase.',
-                                        });
-
-                                        setTimeout(function () {
-                                            window.location.href = `/onlinepayment?addressId=${addressId}&totalAmount=${totalAmount}&couponCode=${couponCode}`;
-                                        }, 1000);
-                                    }
-                                },
-                                theme: {
-                                    color: "#3399cc",
-                                },
-                            };
-
-                            rzp1 = new Razorpay(options);
-
-                            rzp1.on('payment.failed', function (response) {
-                                // console.log("Payment failed:", response.error);
-                                // handlePaymentFailure(response.error, addressId);
-                            });
-
-                            rzp1.open();
-                        }
-
-                        document.getElementById('rzp-button1').addEventListener('click', function (event) {
-                            event.preventDefault();
-                            var addressId = document.getElementById('selected-address-id').value; // Get the addressId from hidden input
-                            fetch(`/onlineRepayment?totalAmount=${totalAmount}&orderId=${orderId}&couponCode=${couponCode}`, requestOptions)
-                                .then(response => response.json())
-                                .then(data => {
-                                    if (data.message == 'Stock out') {
-                                        window.location.href = '/cart?message=stockout';
-                                    } else if (data.message == 'Stock low') {
-                                        window.location.href = '/cart?message=stocklow';
-                                    }
-                                    const orderId = data.razorOrder;
-                                    const paymentStatus = data.paymentStatus;
-                                    initiatePayment(orderId, paymentStatus);
-                                })
-                                .catch(error => {
-                                    console.error("Fetch error:", error);
-                                });
-                        });
-                    });
-
-
-                 
-
-                    document.getElementById('walletButton').addEventListener('click', function(event) {
-    event.preventDefault();
-
-    var addressId = document.getElementById('selected-address-id').value.trim();
-    var totalAmount = parseFloat(document.getElementById('totalAmount').value);
-
-    fetch(`/walletChecking?addressId=${addressId}&totalAmount=${totalAmount}`)
-        .then(response => {
-            if (response.ok) {
-                return response.json();
-            } else {
-                return response.text().then(text => {
-                    throw new Error(text);
-                });
-            }
-        })
-        .then(data => {
-            if (data.status === "Success") {
-                window.location.href = `walletRepayment?orderId=${orderId}&totalAmount=${totalAmount}`;
-            }
-            document.getElementById('walletMessage').innerHTML = data.message;
-        })
-        .catch(error => {
-            console.error('Error with wallet payment:', error);
-            Swal.fire({
-                icon: 'error',
-                title: 'Payment Error',
-                text: 'There was an error processing your wallet payment. Please try again.',
-            });
-        });
-});
-
-
-    </script>
+    
 
     
     <script>

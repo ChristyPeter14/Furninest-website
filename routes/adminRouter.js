@@ -19,6 +19,8 @@ router.post("/login",adminController.login)
 
 router.get("/dashboard",adminAuth,adminController.loadDashBoard)
 
+router.get('/getChartData',adminAuth, adminController.getChartData)
+
 router.get("/logout",adminController.logout)
 
 // customer management

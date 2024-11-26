@@ -58,6 +58,56 @@ async function sendVerificationEmail(email,otp){
     }
 }
 
+//forgot password otpverification mail
+
+const sendForgotVerificationEmail=async(email,otp)=>{
+    try {
+        const transporter=nodeMailer.createTransport({
+            service:"gmail",
+            port:587,
+            secure:false,
+            requireTLS:true,
+            auth:{
+                user:"nchristyp98@gmail.com",
+                pass:process.env.NODEMAILER_PASSWORD
+            }
+        })
+
+        const mailOptions={
+            from:process.env.NODEMAILER_EMAIL,
+            to:email,
+            subject:"Your OTP for password rest",
+            text:`Your OTP is ${otp}`,
+            html:`<b> <h4>Your OTP:${otp}</h4></b>`
+        }
+
+        const info=await transporter.sendMail(mailOptions)
+        console.log("email sent :,", info.messageId)
+        return true
+        
+    } catch (error) {
+        console.error("Error sending email ",error)
+        return false
+        
+    }
+}
+
+const verifyForgotPassOtp=async(req,res)=>{
+    try {
+        const enteredOtp=req.body.otp
+        console.log("entered otp: ",enteredOtp);
+        
+        if(enteredOtp===req.session.userOtp){
+            res.json({success:true,redirectUrl:"/reset-password"})
+        }else{
+            res.json({success:false,message:"OTP not matching"})
+        }
+    } catch (error) {
+        res.status(500).json({success:false,message:"An error occured . Please try again."})
+        
+    }
+}
+
 const signup= async (req,res)=>{
     try {
        const {name,phone,email,password,cpassword}=req.body
@@ -236,6 +286,103 @@ const pageNotFound=async (req,res)=>{
         
     }
 }
+
+
+const getForgotPassword=async(req,res)=>{
+    try {
+        res.render('forgot-password')
+        
+    } catch (error) {
+        res.redirect('/pageNotFound')
+        
+    }
+}
+
+const forgotEmailValid=async(req,res)=>{
+    try {
+        const {email}=req.body
+        console.log("forgot email: ",email)
+        const findUser=await User.findOne({email:email})
+        if(findUser){
+            const otp=generateOtp()
+
+            const emailSend=await sendForgotVerificationEmail(email,otp)
+            if(emailSend){
+                req.session.userOtp=otp
+                req.session.email=email
+                res.render('forgotPass-otp')
+                console.log("otp : ",otp)
+            }else {
+                res.json({success: false, message:"Failed to send otp. please try again"})
+            }
+        }else{
+            res.render('forgot-password',{
+                message:"User with this email does not exist"
+            })
+        }
+    } catch (error) {
+        res.redirect('/pageNotFound')
+    }
+}
+
+const getResetPassPage=async(req,res)=>{
+    try {
+        res.render('reset-password')
+    } catch (error) {
+        res.redirect("/pageNotFound")
+        
+    }
+}
+
+
+const resendForgotOtp=async(req,res)=>{
+    try {
+        const otp=generateOtp()
+        console.log("resend otp: ",otp);
+        
+        req.session.userOtp=otp
+        const email=req.session.email
+        console.log('resend email : ',email);
+        const emailSend=await sendForgotVerificationEmail(email,otp)
+        if(emailSend){
+            console.log("resend otp in email send: ",otp)
+            res.status(200).json({success:true,message:"Resend OTP successfull"})
+        }
+        
+    } catch (error) {
+        console.error("Error in resend OTP",error)
+        res.status(500).json({success:false,message:"Internal server error"})
+        
+    }
+}
+
+const postNewPassword=async(req,res)=>{
+    try {
+        const{newPass1,newPass2}=req.body
+        console.log("newpasswords:",newPass1,newPass2)
+        const email=req.session.email
+        console.log("email : ",email)
+
+        if(newPass1===newPass2){
+            console.log('checking');
+            
+            const passwordHash=await securePassword(newPass1)
+            console.log("passwordhash: ",passwordHash)
+            await User.updateOne({email:email},
+                {$set:{password:passwordHash}}
+            )
+          
+            res.redirect('/login')
+        }else{
+            res.render('reset-password',{message:"passwords donot match"})
+        }
+    } catch (error) {
+        res.redirect('/pageNotFound')
+        
+    }
+}
+
+
 
 
 const loadHomepage=async (req,res)=>{
@@ -814,7 +961,13 @@ module.exports={
     deleteAddress,
     showOrder,
     userAccountDetails,
-    updateUserDetail,updatePassword
+    updateUserDetail,updatePassword,
+    getForgotPassword,
+    forgotEmailValid,
+    verifyForgotPassOtp,
+    getResetPassPage,
+    resendForgotOtp,
+    postNewPassword
     
 
 }

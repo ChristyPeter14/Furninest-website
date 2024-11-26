@@ -1,8 +1,13 @@
 const User=require("../../models/userSchema")
+const Category=require('../../models/categorySchema')
+const Product=require('../../models/productSchema')
 const mongoose=require("mongoose")
 const bcrypt=require("bcrypt")
 const Order = require("../../models/orderSchema")
 const Coupon = require("../../models/couponSchema")
+const Brand=require("../../models/brandSchema")
+
+
 const moment=require('moment')
 
 const path = require('path');
@@ -56,15 +61,231 @@ const login=async (req,res)=>{
 const loadDashBoard=async (req,res)=>{
     if(req.session.admin){
         try {
-            // const user=await User.find({})
-            // const order=await Order.find({})
+            const user=await User.find({})
+            console.log(user)
 
-            res.render("dashboard")
+            const order=await Order.find({}).sort({orderDate:-1}).populate('userId')
+            const product=await Product.find({})
+            let totalTransactions=0
+            const orderData=await Order.aggregate([
+               {$unwind:'$products'} ,
+               {$group:{
+                _id:{month:{$month:'$orderDate'}},
+                totalOrders:{$sum:1},
+                totalProducts:{$sum:'$products.quantity'}
+               }},
+               {$sort:{
+                '_id.month':1//sort by month
+               }}
+
+            ])
+            console.log('orderdata: ',orderData)
+
+            const userData=await User.aggregate([
+                {$group:{
+                    _id:{$month:'$date'},
+                    totalRegister:{$sum:1}
+                }},
+                {
+                    $sort:{'_id':1}   //sort by month
+                }
+            ])
+            console.log('dashboard userData:',userData)
+
+            const orderStats=await Order.aggregate([
+                {$unwind:'$products'},
+                {$lookup:{
+                    from:'products',
+                    localField:'products.productId',
+                    foreignField:'_id',
+                    as:'productInfo'
+                }},
+                {$unwind:'$productInfo'},
+                {$lookup:{
+                    from:'categories',
+                    localField:'productInfo.categoryId',
+                    foreignField:'_id',
+                    as:'categoryInfo'
+                }},
+                {$group:{
+                    _id:'$categoryInfo._id',
+                    name:{$first:'$categoryInfo.name'},
+                    orderCount:{$sum:1}
+                }}
+
+            ])
+            console.log('dashboard order stata: ',orderStats);
+            
+
+            const categoryStats=await Order.aggregate([
+                {$unwind:'$products'},
+                {$lookup:{
+                    from:'products',
+                    localField:'products.productId',
+                    foreignField:'_id',
+                    as:'productInfo'
+                }},
+                {$unwind:'$productInfo'},
+                {$lookup:{
+                    from:'categories',
+                    localField:'productInfo.categoryId',
+                    foreignField:'_id',
+                    as:'categoryInfo'
+                }},
+                {$group:{
+                    _id:'$productInfo.categoryId',
+                    name:{$first:'$categoryInfo.name'},
+                    totalQuantitySold:{$sum:'$products.quantity'}
+                }},
+                {$sort:{totalQuantitySold:-1}},
+                {$limit:10}
+            ])
+
+            console.log(categoryStats)
+
+            const brandStats=await Order.aggregate([
+                {$unwind:'$products'},
+                {$lookup:{
+                    from:'products',
+                    localField:'products.productId',
+                    foreignField:'_id',
+                    as:'productInfo'
+                }},
+                {$unwind:'$productInfo'},
+                {$lookup:{
+                    from:'brands',
+                    localField:'productInfo.brandId',
+                    foreignField:'_id',
+                    as:'brandInfo'
+                }},
+                {$group:{
+                    _id:'$produtInfo.brandId',
+                    brandName:{$first:'$brandInfo.brandName'},
+                    totalQuantitySold:{$sum:'$products.quantity'}
+                }},
+                {$sort:{totalQuantitySold:-1}},
+                {$limit:10}
+            ])
+            console.log(brandStats)
+
+            const categoryNames=JSON.stringify(orderStats.map(stat=>stat.name).flat())
+            console.log('cateogory names',categoryNames)
+            const orderCounts=JSON.stringify(orderStats.map(stat=>stat.orderCount))
+
+            const monthlyData=Array.from({length:12},(_,index)=>{
+               const monthOrderData=orderData.find(item=>item._id.month===index+1)||{totalOrders:0,totalProducts:0}
+               const monthUserData=userData.find(item=>item._id===index+1)||{totalRegister:0}
+               return{
+                totalOrders:monthOrderData.totalOrders,
+                totalProducts:monthOrderData.totalProducts,
+                totalRegister:monthUserData.totalRegister
+               }
+            })
+
+            const totalOrdersJson=JSON.stringify(monthlyData.map(item=>item.totalOrders))
+            const totalProductsJson=JSON.stringify(monthlyData.map(item=>item.totalProducts))
+            const totalRegisterJson=JSON.stringify(monthlyData.map(item=>item.totalRegister))
+
+            order.forEach((item)=>{
+                if(item.totalAmount!==undefined&&item.totalAmount!==null){
+                    totalTransactions+=parseFloat(item.totalAmount)
+                }
+            })
+
+            //top 10 best selling product by popularity
+            const topSellingProducts=await Product.find().sort({popularity:-1}).limit(10).exec()
+
+            res.render("dashboard",{
+                user,
+                order,
+                product,
+                totalTransactions,
+                totalRegisterJson,
+                totalOrdersJson,
+                totalProductsJson,
+                categoryNames,
+                orderCounts,
+                topSellingProducts,
+                categoryStats,
+                brandStats
+            })
         } catch (error) {
             res.redirect("/pageNotFound")
         }
     }
 }
+
+const getChartData = async (req, res) => {
+    try {
+        console.log('Request query:', req.query);
+        const filter = req.query.filter || 'yearly';
+        const currentDate = new Date();
+        let startDate, endDate;
+
+        switch (filter) {
+            case 'daily':
+                startDate = new Date(currentDate.setHours(0, 0, 0, 0));
+                endDate = new Date(startDate);
+                endDate.setDate(startDate.getDate() + 1);
+                break;
+            case 'monthly':
+                startDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+                endDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1);
+                break;
+            case 'weekly':
+                startDate = new Date(currentDate.setDate(currentDate.getDate() - currentDate.getDay()));
+                startDate.setHours(0, 0, 0, 0);
+                endDate = new Date(startDate);
+                endDate.setDate(endDate.getDate() + 7);
+                break;
+            default:
+                startDate = new Date(currentDate.getFullYear(), 0, 1);
+                endDate = new Date(currentDate.getFullYear() + 1, 0, 1);
+        }
+
+        console.log("Filter:", filter, "StartDate:", startDate, "EndDate:", endDate);
+
+        const matchStage = { $match: { orderDate: { $gte: startDate, $lt: endDate } } };
+        const orderStats = await Order.aggregate([
+            matchStage,
+            { $unwind: '$products' },
+            {
+                $lookup: {
+                    from: 'products',
+                    localField: 'products.productId',
+                    foreignField: '_id',
+                    as: 'productInfo'
+                }
+            },
+            { $unwind: '$productInfo' },
+            {
+                $lookup: {
+                    from: 'categories',
+                    localField: 'productInfo.categoryId',
+                    foreignField: '_id',
+                    as: 'categoryInfo'
+                }
+            },
+            { $unwind: '$categoryInfo' },
+            {
+                $group: {
+                    _id: '$categoryInfo._id',
+                    categoryName: { $first: '$categoryInfo.categoryName' },
+                    orderCount: { $sum: 1 }
+                }
+            },
+            { $sort: { orderCount: -1 } }
+        ]);
+
+        const categoryNames = orderStats.map(stat => stat.categoryName || "Unknown Category");
+        const orderCounts = orderStats.map(stat => stat.orderCount || 0);
+
+        res.json({ categoryNames, orderCounts });
+    } catch (error) {
+        console.error("Error in getChartData:", error.message);
+        res.status(500).send({ error: 'Failed to fetch data' });
+    }
+};
 
 const logout= async (req,res)=>{
     try {
@@ -373,6 +594,7 @@ module.exports={
     logout,
     salesReport,
     excelReport,
-    pdfReport
+    pdfReport,
+    getChartData
 
 }

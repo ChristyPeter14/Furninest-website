@@ -65,6 +65,17 @@
         font-size: 1.5rem;
       }
     }
+    .forgot-password-link{
+      font-size: .6 rem;
+      color: blue;
+      text-decoration: none;
+      margin-bottom: 5px;
+
+    }
+    .forgot-password-link:hover{
+      color: blueviolet;
+      text-decoration: underline;
+    }
   </style>
 </head>
 <body>
@@ -86,7 +97,11 @@
     <div class="alert alert-danger text-center">
         <%=message%>
     </div>
+   
     <%}%>
+    <div class="form-group d-flex justify-content-end">
+      <a href="/forgot_password" class="forgot-password-link ms-auto" >Forgot Password?</a>
+    </div>
 
       <button type="submit" class="btn btn-primary btn-custom">Login</button>
     </form>
