@@ -77,6 +77,35 @@
           <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm your password" name="cpassword" required>
           <div id="err5" class="error_message"></div>
         </div>
+        <div class="form-check d-flex justify-content-center mb-4">
+          <label class="form-check-label" for="terms" onclick="toggleReferralCodeInput()">
+              have any referralCode <a href="#!">click here</a>
+          </label>
+      </div>
+
+        <!-- Referral Code Input Field (Initially Hidden) -->
+        <div id="referralCodeInputContainer" style="display: none;">
+            
+          <input type="text" id="referralCodeInput" class="form-control form-control-lg" name="referralCode" placeholder="Enter Referral Code" onkeyup="checkReferral()" />
+          <span class="text-secondary" id="referralMessage"></span>
+        </div>
+
+        <script>
+          function toggleReferralCodeInput() {
+              const referralCodeInputContainer = document.getElementById('referralCodeInputContainer');
+              referralCodeInputContainer.style.display = referralCodeInputContainer.style.display === 'none' ? 'block' : 'none';
+          }
+      </script>
+      <script>
+          function checkReferral(){
+            var code=document.getElementById('referralCodeInput').value
+            fetch(`/checkReferral?code=${code}`)
+            .then(response=>response.json())
+            .then(data=>{
+              document.getElementById('referralMessage').innerHTML=data.message
+            })
+          }
+        </script>
 
         <% if(locals.message && message.length>0){%>
           <div class="alert alert-danger text-center">

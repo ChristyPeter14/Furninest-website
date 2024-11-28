@@ -12,6 +12,7 @@ const session = require('express-session')
 const Address = require("../../models/addressSchema")
 const {v4:uuidv4} = require('uuid');
 const mongoose = require('mongoose');
+const RandomString=require('randomstring')
 
 const signupPage =async (req,res)=>{
 
@@ -110,7 +111,7 @@ const verifyForgotPassOtp=async(req,res)=>{
 
 const signup= async (req,res)=>{
     try {
-       const {name,phone,email,password,cpassword}=req.body
+       const {name,phone,email,password,cpassword,referralCode}=req.body
        
        if(password!==cpassword){
         return res.render("signup",{message:"password do not  match"})
@@ -131,7 +132,7 @@ const signup= async (req,res)=>{
        }
 
        req.session.userOtp=otp
-       req.session.userData={name,phone,email,password} 
+       req.session.userData={name,phone,email,password,referralCode} 
        
 
        res.render("verify-otp")
@@ -141,6 +142,29 @@ const signup= async (req,res)=>{
     } catch (error) {
         console.error("signup error",error)
         res.redirect("/pageNotFound")
+    }
+}
+
+// check referal
+
+const checkReferal=async(req,res)=>{
+    try {
+        const code=req.query.code
+        const userData=await User.findOne({referalCode:code})
+        if(userData){
+            req.session.referralCode=code
+            res.status(200).json({
+                message:'Valid Code'
+            })
+        }else{
+            res.status(200).json({
+                message:'Invalid Code'
+            })
+        }
+    } catch (error) {
+        console.log(error.message)
+        res.redirect('/pageNotFound')
+        
     }
 }
 
@@ -184,10 +208,30 @@ const verifyOtp = async (req, res) => {
         const { otp } = req.body;  
         console.log('OTP from client:', otp);
         console.log('OTP from session:', req.session.userOtp);
+        const{email}=req.session.userData
+        console.log("verifyotp email: ",email);
+        
 
         // Checking if the OTP matches
         if (otp === req.session.userOtp) {
             const user = req.session.userData; 
+
+            //referal code
+            const myReferralCode=await generateReferalCode()
+
+            async function generateReferalCode(){
+                const randomString=RandomString.generate(5)
+                const randomNumber=Math.floor(100+Math.random()*900).toString()
+                const RandomReferalCode=randomString+randomNumber
+
+                const userData=await User.findOne({RandomReferalCode})
+
+                if(userData){
+                    return await generateReferalCode()
+                }else{
+                    return RandomReferalCode
+                }
+            }
 
             // Hashing the password
             const passwordHash = await securePassword(user.password);
@@ -196,9 +240,23 @@ const verifyOtp = async (req, res) => {
                 name: user.name,
                 email: user.email,
                 phone: user.phone,
-                password: passwordHash
+                password: passwordHash,
+                referalCode:myReferralCode //referal code
+
             });
             await saveUserData.save();
+
+            //referal code
+            const code=await User.findOne({referalCode:myReferralCode})
+            console.log("referal code: ",+myReferralCode);
+
+            if(myReferralCode&&code){
+                await User.findOneAndUpdate({referalCode:myReferralCode},{$inc:{wallet:+200}})
+                await User.findOneAndUpdate({email:email},{$set:{wallet:100}})
+            }
+
+
+            
 
             // Do not set req.session.user here. Instead, redirect to login page.
             res.json({ success: true, redirectUrl: "/login" });
@@ -967,7 +1025,8 @@ module.exports={
     verifyForgotPassOtp,
     getResetPassPage,
     resendForgotOtp,
-    postNewPassword
+    postNewPassword,
+    checkReferal
     
 
 }

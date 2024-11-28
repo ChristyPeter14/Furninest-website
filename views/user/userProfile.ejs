@@ -73,11 +73,12 @@
 
         /* Profile Details */
         .profile-details {
+            width: 800px;
             flex-grow: 1;
             padding: 1.5rem;
             background-color: #ffffff;
             border-radius: 0.5rem;
-            margin-left: 1rem;
+            margin-left: 30px;
         }
         .profile-details h2 {
             margin-bottom: 1.5rem;
@@ -148,48 +149,67 @@
     
 
     <!-- Main Container -->
-    <div class="container main-container">
-        <!-- Side Navigation -->
-        <div class="side-nav">
-            <h5>Dashboard</h5>
-            <button class="btn" ><a style="text-decoration: none;color: #000000;" href="/userAddress">Address</a></button>
-            <a style="text-decoration: none;" href="/showOrder"><button class="btn">My Orders</button></a>
-            <a style="text-decoration: none;" href="/userAccountDetails"> <button class="btn">Edit Account Details</button></a>
-            <a style="text-decoration: none;" href="/wallet"> <button class="btn">Wallet</button></a>
-            <button class="btn">Referral Code</button>
-        </div>
+   <!-- Main Container -->
+<div class="container main-container">
+    <!-- Side Navigation -->
+    <div class="side-nav">
+        <h5>Dashboard</h5>
+        <button class="btn" ><a style="text-decoration: none;color: #000000;" href="/userAddress">Address</a></button>
+        <a style="text-decoration: none;" href="/showOrder"><button class="btn">My Orders</button></a>
+        <a style="text-decoration: none;" href="/userAccountDetails"> <button class="btn">Edit Account Details</button></a>
+        <a style="text-decoration: none;" href="/wallet"> <button class="btn">Wallet</button></a>
+        <a style="text-decoration: none;"  href="/logout"> <button class="btn">Logout</button></a>
+       
+    </div>
 
-        <!-- Profile Details Table -->
+    <!-- Profile Content -->
+    <div class="profile-content">
+        <!-- Profile Details Section -->
         <div class="profile-details">
-            <h2>Hello,<%=locals.user.name%></h2>
+            <h2>Hello, <%= locals.user.name %></h2>
             <table class="table table-bordered profile-table">
                 <tbody>
                     <tr>
                         <th>Name</th>
-                        <td><%=locals.user.name%></td>
+                        <td><%= locals.user.name %></td>
                     </tr>
                     <tr>
                         <th>Email</th>
-                        <td><%=locals.user.email%></td>
+                        <td><%= locals.user.email %></td>
                     </tr>
                     <tr>
                         <th>Phone Number</th>
-                        <td><%=locals.user.phone%></td>
+                        <td><%= locals.user.phone %></td>
                     </tr>
-                    <%if(locals.address){%>
+                    <% if (locals.address) { %>
                     <tr>
                         <th>Address</th>
-                        <td><%=locals.address.city%>, <%=locals.address.state%>,<%=locals.address.country%></td>
+                        <td><%= locals.address.city %>, <%= locals.address.state %>, <%= locals.address.country %></td>
                     </tr>
                     <tr>
                         <th>Pincode</th>
-                        <td><%=locals.address.pincode%></td>
+                        <td><%= locals.address.pincode %></td>
                     </tr>
-                    <%}%>
+                    <% } %>
                 </tbody>
             </table>
         </div>
+
+        <!-- Referral Code Section -->
+        <div class="profile-details">
+            <h3>Your Referral Code</h3>
+            <div class="card">
+                <div class="card-body">
+                    <% if (locals.user.referalCode) { %>
+                        <p class="mb-0">Your referral code is: <strong><%= locals.user.referalCode %></strong></p>
+                    <% } else { %>
+                        <p class="text-muted mb-0">Referral code not generated yet. Please contact support for assistance.</p>
+                    <% } %>
+                </div>
+            </div>
+        </div>
     </div>
+</div>
     <%-include("../../views/partials/user/footer")%>
    
 

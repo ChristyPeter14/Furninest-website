@@ -8,16 +8,14 @@
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-      <!-- Swiper's CSS -->
+    <!-- FontAwesome -->
+    <script src="https://kit.fontawesome.com/16d4885483.js" crossorigin="anonymous"></script>
+    <!-- Swiper CSS -->
     <link href="https://unpkg.com/swiper/swiper-bundle.min.css" rel="stylesheet">
     <!-- DataTables CSS -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
-   
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Custom CSS -->
     <style>
-        /* Custom CSS for Dashboard Styling */
-        
         body {
             font-family: Arial, sans-serif;
             background-color: #f8f9fa;
@@ -68,36 +66,36 @@
         .sales-section, .revenue-section, .top-selling-products {
             margin-top: 30px;
         }
-        /* Additional custom styles */
-.swiper-container {
-    max-width: 100%;
-    overflow: hidden;
-}
 
-.swiper-slide {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
+        .swiper-container {
+            max-width: 100%;
+            overflow: hidden;
+        }
 
-.product-card {
-    background-color: #fff;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    padding: 15px;
-    text-align: center;
-}
+        .swiper-slide {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
-.product-title {
-    font-size: 16px;
-    color: #333;
-}
+        .product-card {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+            text-align: center;
+        }
 
-.product-price {
-    font-size: 14px;
-    color: #666;
-    margin-top: 5px;
-}
+        .product-title {
+            font-size: 16px;
+            color: #333;
+        }
+
+        .product-price {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
     </style>
 </head>
 
@@ -123,7 +121,7 @@
                 <div class="card p-3">
                     <div class="card-body text-center">
                         <h5>Total Customers</h5>
-                        <p class="card-text fs-3"><%=user.length%></p>
+                        <p class="card-text fs-3"><%= user.length %></p>
                     </div>
                 </div>
             </div>
@@ -133,7 +131,7 @@
                 <div class="card p-3">
                     <div class="card-body text-center">
                         <h5>Total Orders</h5>
-                        <p class="card-text fs-3"><%=order.length%></p>
+                        <p class="card-text fs-3"><%= order.length %></p>
                     </div>
                 </div>
             </div>
@@ -143,33 +141,28 @@
                 <div class="card p-3">
                     <div class="card-body text-center">
                         <h5>Total Products</h5>
-                        <p class="card-text fs-3"><%=product.length%></p>
+                        <p class="card-text fs-3"><%= product.length %></p>
                     </div>
                 </div>
             </div>
 
-            <!-- Total Transactions Card -->
-            <div class="col-md-3">
-                <div class="card p-3">
-                    <div class="card-body text-center">
-                        <h5>Total Transactions</h5>
-                        <p class="card-text fs-3">Rs. <%=totalTransactions%></p>
-                    </div>
-                </div>
-            </div>
+            <!-- Total Revenue Card -->
+            
         </div>
 
-        <!-- Sales Statistics Section --> 
+        <!-- Sales Statistics Section -->
         <div class="sales-section mb-4">
             <h4>Sale Statistics</h4>
             <canvas id="myChart" height="100px"></canvas>
-        </div> 
+        </div>
 
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <script>
-            const totalOrdersJson = <%-totalOrdersJson-%>;
-            const totalProductsJson = <%-totalProductsJson-%>;
-            const totalRegisterJson = <%-totalRegisterJson-%>;
+            // Parse dynamic data from the backend
+            const totalOrdersJson = '<%- totalOrdersJson %>';
+            console.log("totalOrderJson",totalOrdersJson);
+            
+            const totalProductsJson = '<%- totalProductsJson %>';
+            const totalRegisterJson = '<%- totalRegisterJson %>';
 
             if (document.getElementById('myChart')) {
                 var ctx = document.getElementById('myChart').getContext('2d');
@@ -178,30 +171,29 @@
                     data: {
                         labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
                         datasets: [{
-                                label: 'Users',
-                                tension: 0.3,
-                                fill: true,
-                                backgroundColor: 'rgba(44, 120, 220, 0.2)',
-                                borderColor: 'rgba(44, 120, 220)',
-                                data: totalRegisterJson
-                            },
-                            {
-                                label: 'Products',
-                                tension: 0.3,
-                                fill: true,
-                                backgroundColor: 'rgba(4, 209, 130, 0.2)',
-                                borderColor: 'rgb(4, 209, 130)',
-                                data: totalProductsJson
-                            },
-                            {
-                                label: 'Orders',
-                                tension: 0.3,
-                                fill: true,
-                                backgroundColor: 'rgba(380, 200, 230, 0.2)',
-                                borderColor: 'rgb(380, 200, 230)',
-                                data: totalOrdersJson
-                            }
-                        ]
+                            label: 'Users',
+                            tension: 0.3,
+                            fill: true,
+                            backgroundColor: 'rgba(44, 120, 220, 0.2)',
+                            borderColor: 'rgba(44, 120, 220)',
+                            data: totalRegisterJson
+                        },
+                        {
+                            label: 'Products',
+                            tension: 0.3,
+                            fill: true,
+                            backgroundColor: 'rgba(4, 209, 130, 0.2)',
+                            borderColor: 'rgb(4, 209, 130)',
+                            data: totalProductsJson
+                        },
+                        {
+                            label: 'Orders',
+                            tension: 0.3,
+                            fill: true,
+                            backgroundColor: 'rgba(380, 200, 230, 0.2)',
+                            borderColor: 'rgb(380, 200, 230)',
+                            data: totalOrdersJson
+                        }]
                     },
                     options: {
                         plugins: {
@@ -217,200 +209,112 @@
         </script>
 
         <!-- Revenue by Category Section -->
-       <!-- Revenue by Category Section -->
-<div class="revenue-section mb-4">
-    <h4>Revenue by Category</h4>
-    <!-- Dropdown for filtering -->
-    <select id="filterDropdown" class="form-select mb-3">
-        <option value="yearly">Yearly</option>
-        <option value="monthly">Monthly</option>
-        <option value="weekly">Weekly</option>
-        <option value="daily">Daily</option>
-    </select>
-    
-    <!-- Canvas for the Doughnut Chart -->
-    <canvas id="myChart2" height="125"></canvas>
-</div>
+        <div class="revenue-section mb-4">
+            <h4>Revenue by Category</h4>
+            <!-- Dropdown for filtering -->
+            <select id="filterDropdown" class="form-select mb-3">
+                <option value="yearly">Yearly</option>
+                <option value="monthly">Monthly</option>
+                <option value="weekly">Weekly</option>
+                <option value="daily">Daily</option>
+            </select>
 
-<!-- Swiper JS and Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+            <!-- Canvas for the Doughnut Chart -->
+            <canvas id="myChart2" height="125"></canvas>
+        </div>
 
-<script>
-    let myChartInstance = null; // Keep a reference to the chart instance
+        <script>
+            let myChartInstance = null; // Keep a reference to the chart instance
 
-    // Function to render the chart
-    const renderChart = (labels, data) => {
-        if (myChartInstance) {
-            myChartInstance.destroy(); // Destroy the previous chart instance to prevent overlap
-        }
+            // Function to render the chart
+            const renderChart = (labels, data) => {
+                if (myChartInstance) {
+                    myChartInstance.destroy(); // Destroy the previous chart instance to prevent overlap
+                }
 
-        // Create the new chart
-        myChartInstance = new Chart(document.getElementById("myChart2"), {
-            type: "doughnut", // Doughnut chart type
-            data: {
-                labels: labels, // Category names (labels)
-                datasets: [{
-                    backgroundColor: ["#b91d47", "#00aba9", "#2b5797", "#e8c3b9", "#1e7145", "#f39c12", "#8425B3"],
-                    data: data // Revenue or order counts for each category
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'top',
+                // Create the new chart
+                myChartInstance = new Chart("myChart2", {
+                    type: "doughnut", // Doughnut chart type
+                    data: {
+                        labels: labels, // Category names (labels)
+                        datasets: [{
+                            backgroundColor: ["#b91d47", "#00aba9", "#2b5797", "#e8c3b9", "#1e7145", "#f39c12", "#8425B3"],
+                            data: data // Revenue or order counts for each category
+                        }]
                     },
-                    tooltip: {
-                        callbacks: {
-                            label: function(tooltipItem) {
-                                return tooltipItem.label + ': ' + tooltipItem.raw + ' units';
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(tooltipItem) {
+                                        return tooltipItem.label + ': ' + tooltipItem.raw + ' units';
+                                    }
+                                }
                             }
                         }
                     }
-                },
-                title: {
-                    display: true,
-                    text: "Revenue Based on Category"
-                }
-            }
-        });
-    };
+                });
+            };
 
-    // Event listener for the filter dropdown
-    document.getElementById('filterDropdown').addEventListener('change', function () {
-        const filter = this.value;
-        fetch(`/admin/getChartData?filter=${filter}`) // Assuming this route fetches data for different time filters
-            .then(response => response.json())
-            .then(data => {
-                if (data.categoryNames && data.orderCounts) {
-                    renderChart(data.categoryNames, data.orderCounts); // Render chart with new data
-                } else {
-                    console.error('Data format is incorrect:', data);
-                }
-            })
-            .catch(error => console.error('Error fetching chart data:', error));
-    });
+            // Example function to update the chart based on the selected filter option
+            document.getElementById("filterDropdown").addEventListener("change", function () {
+                const filter =this.value;
+                console.log('filter: ',filter);
+                
+                fetch(`/admin/getChartData?filter=${filter}`)
+                .then(response=>response.json())
+                .then(data=>{
+                    renderChart(data.categoryNames,data.orderCounts)
+                })
+                .catch(error=>console.error('Error fetching chart data: ',error))
+            });
 
-    // Initial render with data passed from the backend (use the dynamic values in the template)
-    renderChart(<%- categoryNames %>, <%- orderCounts %>); // Data passed from the backend (category names and order counts)
-</script>
-<!-- Top Selling Products Section -->
-<div class="card mb-4">
-    <div class="card-body">
-        <h5 class="card-title">Top 10 Best Selling Products</h5>
-        
-        <!-- Swiper Container -->
-        <div class="swiper-container">
-            <div class="swiper-wrapper">
-                <% topSellingProducts.forEach(product => { %>
-                    <div class="swiper-slide">
-                        <div class="product-card" style="width: 240px; border: 1px solid #ddd; border-radius: 8px; padding: 16px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">
-                            <% if (product.productImage && product.productImage.length > 0) { %>
-                                <img src="/uploads/re-image/<%= product.productImage[0] %>" alt="<%= product.productName %>" class="product-img" style="width: 100%; height: 180px; object-fit: cover; border-radius: 8px;" />
-                            <% } else { %>
-                                <img src="/path/to/default/image.jpg" alt="Default Image" class="product-img" style="width: 100%; height: 180px; object-fit: cover; border-radius: 8px;" />
-                            <% } %>
-                            <h6 class="product-title" style="margin-top: 10px;"><%= product.productName %></h6>
-                            <p class="product-price" style="color: #555; font-weight: bold;">Sold: <%= product.popularity %></p>
+            // Initialize the chart with default data (monthly)
+            renderChart('<%-categoryNames%>','<%-orderCounts%> ')
+        </script>
+
+        <!-- Top Selling Products Section -->
+        <div class="top-selling-products mb-4">
+            <h4>Top Selling Products</h4>
+            <div class="swiper-container">
+                <div class="swiper-wrapper">
+                    <% product.forEach(function(product) { %>
+                        <div class="swiper-slide">
+                            <div class="product-card">
+                                <img src="<%= product.productImage %>" alt="Product Image">
+                                <h5 class="product-title"><%= product.productName %></h5>
+                                <p class="product-price">Rs. <%= product.productPrice %></p>
+                            </div>
                         </div>
-                    </div>
-                <% }) %>
-            </div>
-            
-            <!-- Add Pagination -->
-            <div class="swiper-pagination"></div>
-
-            <!-- Add Navigation -->
-            <div class="swiper-button-prev"></div>
-            <div class="swiper-button-next"></div>
-        </div>
-    </div>
-</div>
-<div class="card mb-4">
-    <div class="card-body">
-        <h5 class="card-title">Top 10 Best Selling Categories</h5>
-        <div class="table-responsive">
-            <table class="table align-middle table-nowrap mb-0" id="categoryTable">
-                <thead class="table-light">
-                    <tr>
-                        <th>Category Name</th>
-                        <th>Total Quantity Sold</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <% for (let i = 0; i < categoryStats.length; i++) { %>
-                        <tr>
-                            <td><%= categoryStats[i].name %></td>
-                            <td><%= categoryStats[i].totalQuantitySold %></td>
-                        </tr>
-                    <% } %>
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
-
-            <!-- Top 10 Best Selling Brands -->
-            <div class="card mb-4">
-                <div class="card-body">
-                    <h5 class="card-title">Top 10 Best Selling Brands</h5>
-                    <div class="table-responsive">
-                        <table class="table align-middle table-nowrap mb-0" id="brandTable">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Brand Name</th>
-                                    <th>Total Quantity Sold</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <% for (let i = 0; i < brandStats.length; i++) { %>
-                                    <tr>
-                                        <td><%= brandStats[i].brandName %></td>
-                                        <td><%= brandStats[i].totalQuantitySold %></td>
-                                    </tr>
-                                <% } %>
-                            </tbody>
-                        </table>
-                    </div>
+                    <% }) %>
                 </div>
             </div>
+        </div>
 
-<!-- Swiper JS -->
-<script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
-
-<!-- Swiper Initialization -->
-<script>
-    // Initialize Swiper
-    const swiper = new Swiper('.swiper-container', {
-        slidesPerView: 5,
-        spaceBetween: 20, // Increased spacing between cards
-        navigation: {
-            nextEl: '.swiper-button-next',
-            prevEl: '.swiper-button-prev',
-        },
-        pagination: {
-            el: '.swiper-pagination',
-            clickable: true,
-        },
-        breakpoints: {
-            1024: {
-                slidesPerView: 5, // 5 slides visible on large screens
-            },
-            768: {
-                slidesPerView: 3, // 3 slides visible on tablets
-            },
-            640: {
-                slidesPerView: 2, // 2 slides visible on mobile devices
-            },
-            480: {
-                slidesPerView: 1, // 1 slide visible on small screens
-            }
-        }
-    });
-</script>
     </div>
 
-   
+    <!-- Bootstrap and JS Dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+    <script>
+        var swiper = new Swiper('.swiper-container', {
+            loop: true,
+            slidesPerView: 3,
+            spaceBetween: 10,
+            navigation: {
+                nextEl: '.swiper-button-next',
+                prevEl: '.swiper-button-prev'
+            }
+        });
+    </script>
 </body>
 
 </html>

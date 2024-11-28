@@ -61,6 +61,12 @@ const productSchema = new Schema({
         required:true,
         default:"Available"
     },
+    popularity:{
+        type:Number,
+        default:0
+    },
+       
+    
     productReview: [
         {
             userId: {

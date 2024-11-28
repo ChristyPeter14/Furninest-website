@@ -59,13 +59,15 @@ const login=async (req,res)=>{
 }
 
 const loadDashBoard=async (req,res)=>{
-    if(req.session.admin){
+    
         try {
             const user=await User.find({})
             console.log(user)
 
             const order=await Order.find({}).sort({orderDate:-1}).populate('userId')
+            console.log("order: ",order)
             const product=await Product.find({})
+            console.log("products: ",product)
             let totalTransactions=0
             const orderData=await Order.aggregate([
                {$unwind:'$products'} ,
@@ -83,7 +85,7 @@ const loadDashBoard=async (req,res)=>{
 
             const userData=await User.aggregate([
                 {$group:{
-                    _id:{$month:'$date'},
+                    _id:{$month:'$createdOn'},
                     totalRegister:{$sum:1}
                 }},
                 {
@@ -159,7 +161,7 @@ const loadDashBoard=async (req,res)=>{
                     as:'brandInfo'
                 }},
                 {$group:{
-                    _id:'$produtInfo.brandId',
+                    _id:'$productInfo.brandId',
                     brandName:{$first:'$brandInfo.brandName'},
                     totalQuantitySold:{$sum:'$products.quantity'}
                 }},
@@ -212,7 +214,7 @@ const loadDashBoard=async (req,res)=>{
         } catch (error) {
             res.redirect("/pageNotFound")
         }
-    }
+    
 }
 
 const getChartData = async (req, res) => {
@@ -221,26 +223,51 @@ const getChartData = async (req, res) => {
         const filter = req.query.filter || 'yearly';
         const currentDate = new Date();
         let startDate, endDate;
+        let groupStage
 
         switch (filter) {
             case 'daily':
                 startDate = new Date(currentDate.setHours(0, 0, 0, 0));
                 endDate = new Date(startDate);
                 endDate.setDate(startDate.getDate() + 1);
+                groupStage={
+                    $group:{
+                        _id:{day:{$dayOfMonth:'$orderDate'},month:{$month:'$orderDate'},year:{$year:'$orderDate'}},
+                        totalOrders:{$sum:1}
+                    }
+                }
                 break;
             case 'monthly':
                 startDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
                 endDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1);
+                groupStage={
+                    $group:{
+                        _id:{month:{$month:'$orderDate'},year:{$year:'$orderDate'}},
+                        totalOrders:{$sum:1}
+                    }
+                }
                 break;
             case 'weekly':
                 startDate = new Date(currentDate.setDate(currentDate.getDate() - currentDate.getDay()));
                 startDate.setHours(0, 0, 0, 0);
                 endDate = new Date(startDate);
                 endDate.setDate(endDate.getDate() + 7);
+                groupStage={
+                    $group:{
+                        _id:{week:{$week:'$orderDate'},year:{$year:'$orderDate'}},
+                        totalOrders:{$sum:1}
+                    }
+                }
                 break;
             default:
                 startDate = new Date(currentDate.getFullYear(), 0, 1);
                 endDate = new Date(currentDate.getFullYear() + 1, 0, 1);
+                groupStage={
+                    $group:{
+                        _id:{year:{$year:'$orderDate'}},
+                        totalOrders:{$sum:1}
+                    }
+                }
         }
 
         console.log("Filter:", filter, "StartDate:", startDate, "EndDate:", endDate);
@@ -270,14 +297,14 @@ const getChartData = async (req, res) => {
             {
                 $group: {
                     _id: '$categoryInfo._id',
-                    categoryName: { $first: '$categoryInfo.categoryName' },
+                    categoryName: { $first: '$categoryInfo.name' },
                     orderCount: { $sum: 1 }
                 }
             },
             { $sort: { orderCount: -1 } }
         ]);
 
-        const categoryNames = orderStats.map(stat => stat.categoryName || "Unknown Category");
+        const categoryNames = orderStats.map(stat => stat.name || "Unknown Category");
         const orderCounts = orderStats.map(stat => stat.orderCount || 0);
 
         res.json({ categoryNames, orderCounts });

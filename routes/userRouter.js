@@ -21,6 +21,9 @@ router.get("/productDetails",userAuth,userController.getProductDetails)
 router.get("/signup",userController.signupPage)
 router.post("/signup",userController.signup)
 
+//referal
+router.get('/checkReferral',userController.checkReferal)
+
 router.get("/login",userController.loadLogin)
 router.post("/login",userController.login)
 router.get("/logout",userController.logout)
