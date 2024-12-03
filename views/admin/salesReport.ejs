@@ -3,136 +3,105 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> Sales Report</title>
+    <title>Sales Report</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
     <style>
-        /* Styling for print */
-        .no-print, .hide-for-print { display: none !important; }
+        .no-print { display: none !important; }
         @media print {
-            .no-print { display: none !important; }
             body { font-size: 10px; }
-            table { width: 100%; }
-            th, td { padding: 4px; font-size: 10px; word-break: break-word; }
-            th { font-weight: bold; }
-            .hide-column { display: none !important; }
+            th, td { padding: 4px; word-break: break-word; }
+            .hide-for-print { display: none !important; }
         }
 
-        /* Header */
         .main-header {
             background-color: #8da7ab;
-            padding: 10px 20px;
             height: 60px;
-            width: 100%;
-            position: fixed;
-            top: 0;
-            z-index: 1000;
+            padding: 10px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-        .navbar-brand h4 { color: #ffffff; margin: 0; }
-
-        /* Main Content */
-        .content-main {
-            padding: 20px;
-            margin-top: 80px; /* To offset the sticky header */
-        }
-        .content-header {
-            padding: 15px;
-            margin-bottom: 20px;
-            background-color: #f5f5f5;
-            border-radius: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .content-actions .btn { margin-left: 10px; }
-
-        /* Card and Table Styling */
-        .card {
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
+        .content-main { margin-top: 80px; padding: 20px; }
+        .content-header { display: flex; justify-content: space-between; align-items: center; }
         .table-responsive { margin-top: 20px; }
-        th, td { white-space: nowrap; }
-        .table thead th {
-            background-color: #f1f1f1;
-            font-weight: bold;
-        }
-        
-        /* Footer Action Button */
-        .action-column { width: 80px; }
-
-        /* Responsive Adjustments */
-        @media (max-width: 768px) {
-            .content-header { flex-direction: column; align-items: flex-start; }
-            .content-actions { display: flex; gap: 10px; margin-top: 10px; }
-        }
+        .card { border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); }
+        .summary-card { margin-top: 20px; }
     </style>
 </head>
 <body>
-<div class="wrapper">
-    <!-- Header -->
-    <header class="main-header navbar">
-        <div class="navbar-brand">
-            <h4>FURNINEST</h4>
-        </div>
-        <div class="col-nav">
-            <ul class="nav">
-                <li class="nav-item">
-                    <a href="/admin/dashboard" class="nav-link text-white">
-                        <i class="fas fa-tachometer-alt"></i> Dashboard
-                    </a>
-                </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fas fa-user"></i> Admin
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="/admin/logout">Logout</a></li>
-                    </ul>
-                </li>
-            </ul>
-        </div>
-    </header>
-</div>
+<header class="main-header navbar">
+    <h4 class="text-white">FURNINEST</h4>
+    <nav>
+        <ul class="nav">
+            <li class="nav-item"><a href="/admin/dashboard" class="nav-link text-white">Dashboard</a></li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown">
+                    Admin
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="/admin/logout">Logout</a></li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
+</header>
 
-<!-- Main Content -->
 <section class="content-main">
     <div class="content-header">
-        <h2 class="content-title card-title">Sales Report</h2>
-        <div class="content-actions">
-            <!-- <a class="btn btn-primary print" id="printScreen">Download PDF Report</a> -->
-            <a href="/admin/downloadPdfReport?startDate=<%=start%>&endDate=<%=end%>" class="btn btn-primary">Download PDF Report</a>
-            <a href="/admin/downloadExcel?startDate=<%=start%> & endDate=<%=end%>" class="btn btn-primary">Download Excel Report</a>
+        <h2>Sales Report</h2>
+        <div>
+            <a href="/admin/downloadPdfReport?startDate=<%= start %>&endDate=<%= end %>" class="btn btn-primary">Download PDF</a>
+            <a href="/admin/downloadExcel?startDate=<%= start %>&endDate=<%= end %>" class="btn btn-primary">Download Excel</a>
         </div>
     </div>
 
     <div class="row">
+        <!-- Report Summary Column -->
+        <div class="col-lg-3">
+            <div class="card summary-card mb-4">
+                <div class="card-body">
+                    <h5 class="mb-3">Report Summary</h5>
+                    <div class="mb-4"><label>Total Orders</label><h5 class="text-center"><span class="text-success"><%= totalOrders %></span></h5></div>
+                    <div class="mb-4"><label>Total Customers</label><h5 class="text-center"><span class="text-success"><%= totalCustomers %></span></h5></div>
+                    <div class="mb-4"><label>Online Payments</label><h5 class="text-center"><span class="text-success"><%= onlinePayments %></span></h5></div>
+                    <div class="mb-4"><label>Cash on Delivery</label><h5 class="text-center"><span class="text-success"><%= cashOnDelivery %></span></h5></div>
+                    <div class="mb-4"><label>Cancelled Orders</label><h5 class="text-center"><span class="text-danger"><%= orderCancelled %></span></h5></div>
+                    <div class="mb-4"><label>Total Discounts</label><h5 class="text-center">₹<span class="text-primary"><%= totalDiscounts.toFixed(2) %></span></h5></div>
+                    <div class="mb-4"><label>Total Coupons</label><h5 class="text-center">₹<span class="text-success"><%= totalCoupons.toFixed(2) %></span></h5></div>
+                    <div class="mb-4"><label>Total Transactions</label><h5 class="text-center">₹<span class="text-success"><%= totalTransaction.toFixed(2) %></span></h5></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Orders List Column -->
         <div class="col-lg-9">
             <div class="card mb-4">
                 <header class="card-header">
-                    <form action="/admin/salesReport" method="get">
-                        <div class="row gx-3">
-                            <%if(locals.start && locals.end){%>
-                            
-                            <div class="col-lg-2 col-md-3 col-6">From: <br><input type="date" name="startDate" class="form-control" value="<%=start%>"></div>
-                            <div class="col-lg-2 col-md-3 col-6">To: <br><input type="date" name="endDate" class="form-control" value="<%=end%>"></div>
-                            <%}else{%>
-                            
-                                <div class="col-lg-2 col-md-3 col-6">From: <br><input type="date" name="startDate" class="form-control"></div>
-                                <div class="col-lg-2 col-md-3 col-6">To: <br><input type="date" name="endDate" class="form-control" ></div>
-                            <%}%>
-                            <div class="col-lg-2 col-md-3 col-6"><button type="submit" class="btn btn-md rounded font-sm">Filter Out</button></div>
-                            <div class="col-lg-2 col-md-3 col-6">
+                    <form id="filterForm" action="/admin/salesReport" method="get">
+                        <div class="row gx-3 align-items-center">
+                            <div class="col-md-3">
+                                <label>Start Date</label>
+                                <input type="date" id="startDate" name="startDate" class="form-control" value="<%= start %>">
+                            </div>
+                            <div class="col-md-3">
+                                <label>End Date</label>
+                                <input type="date" id="endDate" name="endDate" class="form-control" value="<%= end %>">
+                            </div>
+                            <div class="col-md-3">
+                                <label>Filter Range</label>
                                 <select id="dateRange" name="dateRange" class="form-control">
                                     <option value="">Select Range</option>
                                     <option value="day">Today</option>
                                     <option value="week">This Week</option>
                                     <option value="month">This Month</option>
                                     <option value="year">This Year</option>
+                                    <option value="custom">Custom Range</option>
                                 </select>
+                            </div>
+                            <input type="hidden" name="filterType" id="filterType">
+                            <div class="col-md-3">
+                                <button type="submit" class="btn btn-primary mt-3">Apply Filter</button>
                             </div>
                         </div>
                     </form>
@@ -145,41 +114,27 @@
                                 <tr>
                                     <th>Date</th>
                                     <th>ID</th>
-                                    <th>Customer Name</th>
+                                    <th>Customer</th>
                                     <th>Original Price</th>
                                     <th>Sale Price</th>
-                                    <th>Discount Amount</th>
-                                    <th>Discount %</th>
-                                    <th>Coupon</th>
+                                    <th>Discount</th>
                                     <th>Status</th>
-                                    <th class="text-end action-column">Action</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
+                                <% orders.forEach(order => { %>
                                 <tr>
-                                    <%orders.forEach(order=>{%>
-                                
-                                    <td><%=moment(order.orderDate).format('DD-MM-YYYY')%></td>
-                                    <td><%=order.orderId%></td>
-                                    <td><%=order.userId ? order.userId.name :'N/A'%></td>
-                                    <td>₹<%=order.originalTotal ?order.originalTotal.toFixed(2):'N/A'%></td>
-                                    <td>₹<%=order.totalAmount ? order.totalAmount.toFixed(2) :'N/A'%></td>
-                                    <td>₹<%=order.discountAmount ? order.discountAmount.toFixed(2): 'N/A'%></td>
-                                    <td><%=order.totalDiscountPercentage ? order.totalDiscountPercentage.toFixed(2) + '%' : 'N/A' %></td>
-                                    <td><%=order.coupon ? '₹' + order.coupon.toFixed(2):'N/A' %></td>
-                                    <%if(order.orderStatus==='Cancelled' || order.orderStatus==='Returned'){%>
-                                        <td><span class="text-danger"><%=order.orderStatus%></span></td>
-
-                                    <%}else{%>
-                                        <td><span class="text-success"><%=order.orderStatus%></span></td>
-                                    <%}%>
-                                    <td class="text-end action-column">
-                                        <a href="/admin/adminorderDetails?orderId=<%=order._id%>"><button class="btn btn-sm btn-primary">Detail</button></a>
-
-                                    </td>
+                                    <td><%= moment(order.orderDate).format('DD-MM-YYYY') %></td>
+                                    <td><%= order.orderId %></td>
+                                    <td><%= order.userId ? order.userId.name : 'N/A' %></td>
+                                    <td>₹<%= order.originalTotal.toFixed(2) %></td>
+                                    <td>₹<%= order.totalAmount.toFixed(2) %></td>
+                                    <td>₹<%= order.discountAmount.toFixed(2) %></td>
+                                    <td><%= order.orderStatus %></td>
+                                    <td><a href="/admin/adminorderDetails?orderId=<%= order._id %>">Details</a></td>
                                 </tr>
-                                    <%})%>
-                                <!-- Additional rows can be added here -->
+                                <% }); %>
                             </tbody>
                         </table>
                     </div>
@@ -187,81 +142,55 @@
             </div>
         </div>
 
-        <div class="col-lg-3">
-            <div class="card mb-4">
-                <div class="card-body">
-                    <h5 class="mb-3">Report Summary</h5>
-                    <div class="mb-4"><label>Total Orders</label><h5 class="text-center"><span class="text-success"><%=totalOrders%></span> </h5></div>
-                    <div class="mb-4"><label>Total Customers</label><h5 class="text-center"><span class="text-success"><%=totalCustomers%></span> </h5></div>
-                    <div class="mb-4"><label>Online Payments</label><h5 class="text-center"> <span class="text-success"><%=onlinePayments%></span> </h5></div>
-                    <div class="mb-4"><label>Cash on Delivery</label><h5 class="text-center"><span class="text-success"><%=cashOnDelivery%></span></h5></div>
-                    <div class="mb-4"><label>Cancelled Orders</label><h5 class="text-center"><span class="text-danger"><%=orderCancelled%></span></h5></div>
-                    <div class="mb-4"><label>Total Discounts</label><h5 class="text-center">₹<span class="text-primary"><%=totalDiscounts.toFixed(2)%></span></h5></div>
-                    <div class="mb-4"><label>Total Coupons</label><h5 class="text-center">₹<span class="text-success"><%=totalCoupons.toFixed(2)%></span></h5></div>
-                    <div class="mb-4"><label>Total Transactions</label><h5 class="text-center">₹<span class="text-success"><%=totalTransaction.toFixed(2)%></span></h5></div>
-                </div>
-            </div>
-        </div>
     </div>
 </section>
 
-<!-- Scripts -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script type="text/javascript" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
 <script>
-    $(document).ready(function() {
-    $('#salesTable').DataTable();
+    $(document).ready(function () {
+        $('#salesTable').DataTable();
 
-    $('#dateRange').change(function() {
-        var range = $(this).val()
-        var today = new Date()
-        
-        function formatDate(date) {
-            var d = new Date(date),
-                month = '' + (d.getMonth() + 1),
-                day = '' + d.getDate(),
-                year = d.getFullYear();
-            if (month.length < 2) month = '0' + month;
-            if (day.length < 2) day = '0' + day
-            return [year, month, day].join('-')
-        }
+        $('#dateRange').change(function () {
+            const range = $(this).val();
+            const today = new Date();
 
-        if (range === 'day') {
-            // Set both start and end dates to today
-            $('input[name="startDate"]').val(formatDate(today))
-            $('input[name="endDate"]').val(formatDate(today))
+            function formatDate(date) {
+                const d = new Date(date);
+                const month = ('0' + (d.getMonth() + 1)).slice(-2);
+                const day = ('0' + d.getDate()).slice(-2);
+                return d.getFullYear() + '-' + month + '-' + day;
+            }
 
-        } else if (range === 'week') {
-            // Get the start and end dates of the current week
-            var startOfWeek = new Date(today.setDate(today.getDate() - today.getDay()))
-            var endOfWeek = new Date(today.setDate(today.getDate() - today.getDay() + 6))
-            $('input[name="startDate"]').val(formatDate(startOfWeek))
-            $('input[name="endDate"]').val(formatDate(endOfWeek))
+            let startDate, endDate;
 
-        } else if (range === 'month') {
-            // Set to the first and last day of the current month
-            var startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1)
-            var endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0)
-            $('input[name="startDate"]').val(formatDate(startOfMonth))
-            $('input[name="endDate"]').val(formatDate(endOfMonth))
+            if (range === 'day') {
+                startDate = endDate = formatDate(today);
+                $('#filterType').val('daily');
+            } else if (range === 'week') {
+                const startOfWeek = new Date(today.setDate(today.getDate() - today.getDay()));
+                const endOfWeek = new Date(today.setDate(startOfWeek.getDate() + 6));
+                startDate = formatDate(startOfWeek);
+                endDate = formatDate(endOfWeek);
+                $('#filterType').val('weekly');
+            } else if (range === 'month') {
+                startDate = formatDate(new Date(today.getFullYear(), today.getMonth(), 1));
+                endDate = formatDate(new Date(today.getFullYear(), today.getMonth() + 1, 0));
+                $('#filterType').val('monthly');
+            } else if (range === 'year') {
+                startDate = formatDate(new Date(today.getFullYear(), 0, 1));
+                endDate = formatDate(new Date(today.getFullYear(), 11, 31));
+                $('#filterType').val('yearly');
+            } else {
+                startDate = '';
+                endDate = '';
+            }
 
-        } else if (range === 'year') {
-            // Set to the first and last day of the current year
-            var startOfYear = new Date(today.getFullYear(), 0, 1)
-            var endOfYear = new Date(today.getFullYear(), 11, 31)
-            $('input[name="startDate"]').val(formatDate(startOfYear))
-            $('input[name="endDate"]').val(formatDate(endOfYear))
-        }
+            $('#startDate').val(startDate);
+            $('#endDate').val(endDate);
+        });
     });
-
-    // Print functionality
-    $('#printScreen').on('click', function() {
-        window.print();
-    });
-});
-
 </script>
-
 </body>
 </html>

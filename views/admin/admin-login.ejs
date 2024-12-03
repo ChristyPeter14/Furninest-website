@@ -103,6 +103,11 @@
     <div class="container h-100 content-wrapper">
         <div class="col-md-5 col-lg-4 login-container mx-auto">
             <h3>Admin Login</h3>
+            <% if (message) { %>
+                <div class="alert alert-danger" role="alert">
+                    <%= message %>
+                </div>
+            <% } %>
             
             <!-- Login Form -->
             <form method="POST" action="/admin/login">

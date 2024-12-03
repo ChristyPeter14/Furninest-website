@@ -12,6 +12,7 @@
     <script src="https://kit.fontawesome.com/16d4885483.js" crossorigin="anonymous"></script>
     <!-- Swiper CSS -->
     <link href="https://unpkg.com/swiper/swiper-bundle.min.css" rel="stylesheet">
+   
     <!-- DataTables CSS -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
     <!-- Custom CSS -->
@@ -96,6 +97,69 @@
             color: #666;
             margin-top: 5px;
         }
+
+
+        /* swipper */
+        .swiper-button-next,
+.swiper-button-prev {
+    color: #000; /* Change the color as needed */
+    width: 40px;
+    height: 40px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.swiper-button-next {
+    right: 10px; /* Adjust the position from the right edge */
+}
+
+.swiper-button-prev {
+    left: 10px; /* Adjust the position from the left edge */
+}
+
+.swiper-button-next:after,
+.swiper-button-prev:after {
+    font-size: 18px; /* Adjust the size of the arrow icons */
+}
+
+.swiper-container {
+    position: relative;
+    width: 100%;
+    height: 300px; /* Adjust height as needed */
+    overflow: hidden;
+    padding: 20px 0; /* Adjust padding for proper spacing */
+}
+
+    .swiper-slide {
+        display: flex;
+        justify-content: center;
+    }
+
+    .product-card {
+        max-width: 200px;
+        padding: 15px;
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        text-align: center;
+    }
+
+    .product-card img {
+        border-radius: 8px;
+        margin-bottom: 10px;
+    }
+
+    .card-body {
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+
     </style>
 </head>
 
@@ -149,151 +213,82 @@
             <!-- Total Revenue Card -->
             
         </div>
-
-        <!-- Sales Statistics Section -->
-        <div class="sales-section mb-4">
-            <h4>Sale Statistics</h4>
-            <canvas id="myChart" height="100px"></canvas>
-        </div>
-
-        <script>
-            // Parse dynamic data from the backend
-            const totalOrdersJson = '<%- totalOrdersJson %>';
-            console.log("totalOrderJson",totalOrdersJson);
-            
-            const totalProductsJson = '<%- totalProductsJson %>';
-            const totalRegisterJson = '<%- totalRegisterJson %>';
-
-            if (document.getElementById('myChart')) {
-                var ctx = document.getElementById('myChart').getContext('2d');
-                var chart = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-                        datasets: [{
-                            label: 'Users',
-                            tension: 0.3,
-                            fill: true,
-                            backgroundColor: 'rgba(44, 120, 220, 0.2)',
-                            borderColor: 'rgba(44, 120, 220)',
-                            data: totalRegisterJson
-                        },
-                        {
-                            label: 'Products',
-                            tension: 0.3,
-                            fill: true,
-                            backgroundColor: 'rgba(4, 209, 130, 0.2)',
-                            borderColor: 'rgb(4, 209, 130)',
-                            data: totalProductsJson
-                        },
-                        {
-                            label: 'Orders',
-                            tension: 0.3,
-                            fill: true,
-                            backgroundColor: 'rgba(380, 200, 230, 0.2)',
-                            borderColor: 'rgb(380, 200, 230)',
-                            data: totalOrdersJson
-                        }]
-                    },
-                    options: {
-                        plugins: {
-                            legend: {
-                                labels: {
-                                    usePointStyle: true,
-                                },
-                            }
-                        }
-                    }
-                });
-            }
-        </script>
-
-        <!-- Revenue by Category Section -->
-        <div class="revenue-section mb-4">
-            <h4>Revenue by Category</h4>
-            <!-- Dropdown for filtering -->
-            <select id="filterDropdown" class="form-select mb-3">
-                <option value="yearly">Yearly</option>
-                <option value="monthly">Monthly</option>
-                <option value="weekly">Weekly</option>
-                <option value="daily">Daily</option>
-            </select>
-
-            <!-- Canvas for the Doughnut Chart -->
-            <canvas id="myChart2" height="125"></canvas>
-        </div>
-
-        <script>
-            let myChartInstance = null; // Keep a reference to the chart instance
-
-            // Function to render the chart
-            const renderChart = (labels, data) => {
-                if (myChartInstance) {
-                    myChartInstance.destroy(); // Destroy the previous chart instance to prevent overlap
-                }
-
-                // Create the new chart
-                myChartInstance = new Chart("myChart2", {
-                    type: "doughnut", // Doughnut chart type
-                    data: {
-                        labels: labels, // Category names (labels)
-                        datasets: [{
-                            backgroundColor: ["#b91d47", "#00aba9", "#2b5797", "#e8c3b9", "#1e7145", "#f39c12", "#8425B3"],
-                            data: data // Revenue or order counts for each category
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            legend: {
-                                position: 'top',
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    label: function(tooltipItem) {
-                                        return tooltipItem.label + ': ' + tooltipItem.raw + ' units';
-                                    }
-                                }
-                            }
-                        }
-                    }
-                });
-            };
-
-            // Example function to update the chart based on the selected filter option
-            document.getElementById("filterDropdown").addEventListener("change", function () {
-                const filter =this.value;
-                console.log('filter: ',filter);
-                
-                fetch(`/admin/getChartData?filter=${filter}`)
-                .then(response=>response.json())
-                .then(data=>{
-                    renderChart(data.categoryNames,data.orderCounts)
-                })
-                .catch(error=>console.error('Error fetching chart data: ',error))
-            });
-
-            // Initialize the chart with default data (monthly)
-            renderChart('<%-categoryNames%>','<%-orderCounts%> ')
-        </script>
-
-        <!-- Top Selling Products Section -->
-        <div class="top-selling-products mb-4">
-            <h4>Top Selling Products</h4>
-            <div class="swiper-container">
-                <div class="swiper-wrapper">
-                    <% product.forEach(function(product) { %>
-                        <div class="swiper-slide">
-                            <div class="product-card">
-                                <img src="<%= product.productImage %>" alt="Product Image">
-                                <h5 class="product-title"><%= product.productName %></h5>
-                                <p class="product-price">Rs. <%= product.productPrice %></p>
-                            </div>
-                        </div>
-                    <% }) %>
+        <div class="container mt-5">
+            <h1 class="text-center mb-4">Analitics</h1>
+            <div class="text-center mb-3">
+                <button class="btn btn-primary" onclick="fetchChartData('daily')">Daily</button>
+                <button class="btn btn-primary" onclick="fetchChartData('weekly')">Weekly</button>
+                <button class="btn btn-primary" onclick="fetchChartData('monthly')">Monthly</button>
+                <button class="btn btn-primary" onclick="fetchChartData('yearly')">Yearly</button>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <canvas id="barChart"></canvas>
+                </div>
+                <div class="col-md-6">
+                    <canvas id="doughnutChart"></canvas>
                 </div>
             </div>
         </div>
+
+        <div class="top-selling-products mt-5">
+            <h3>Top 10 Selling Products</h3>
+            
+            <div class="swiper-container">
+                <div class="swiper-wrapper">
+                    <% for (let i = 0; i < topSellingProducts.length; i++) { %>
+                        <div class="swiper-slide">
+                            <div class="product-card">
+                                <img src="/uploads/re-image/<%= topSellingProducts[i].productImage %>" alt="<%= topSellingProducts[i].productName %>">
+                                <h5 class="product-title"><%= topSellingProducts[i].productName %></h5>
+                                <p class="product-price">Rs.<%= topSellingProducts[i].salePrice %></p>
+                            </div>
+                        </div>
+                    <% } %>
+                </div>
+                <!-- Swiper Navigation -->
+                <div class="swiper-button-next"></div>
+                <div class="swiper-button-prev"></div>
+            </div>
+            
+        </div>
+        
+        <div class="sales-section mt-5">
+            <h3>Sales by Categories</h3>
+            <div class="row">
+                <% categories.forEach(category => { %>
+                    <div class="col-md-3">
+                        <div class="card p-3">
+                            <div class="card-body text-center">
+                                <h5 class="card-title"><%= category._id %></h5>
+                                <p class="card-text">Sold: <%= category.totalQuantity %></p>
+                            </div>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+        </div>
+        
+        <div class="revenue-section mt-5">
+            <h3>Sales by Brands</h3>
+            <div class="row">
+                <% brands.forEach(brand => { %>
+                    <div class="col-md-3">
+                        <div class="card p-3">
+                            <div class="card-body text-center">
+                                <h5 class="card-title"><%= brand._id %></h5>
+                                <p class="card-text">Sold: <%= brand.totalQuantity %></p>
+                            </div>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+        </div>
+        
+        
+        
+
+       
 
     </div>
 
@@ -304,17 +299,115 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
+
+
     <script>
-        var swiper = new Swiper('.swiper-container', {
-            loop: true,
-            slidesPerView: 3,
-            spaceBetween: 10,
-            navigation: {
-                nextEl: '.swiper-button-next',
-                prevEl: '.swiper-button-prev'
+       let barChartInstance = null;  // Store the bar chart instance globally
+let doughnutChartInstance = null;  // Store the doughnut chart instance globally
+
+// Fetch data for charts from backend API
+async function fetchChartData(filter = 'monthly') {
+    try {
+        const response = await fetch(`/admin/getChartData?filter=${filter}`);
+        const data = await response.json();
+
+        // Data for Bar Chart (Users, Orders, Products)
+        const barChartData = data.barChartData;
+
+        // Data for Doughnut Chart (Revenue and Number of Orders by Categories)
+        const doughnutChartData = data.doughnutChartData;
+
+        // Destroy previous bar chart if it exists
+        if (barChartInstance) {
+            barChartInstance.destroy();
+        }
+
+        // Destroy previous doughnut chart if it exists
+        if (doughnutChartInstance) {
+            doughnutChartInstance.destroy();
+        }
+
+        // Create the Bar Chart
+        const barCtx = document.getElementById("barChart").getContext("2d");
+        barChartInstance = new Chart(barCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Users', 'Orders', 'Products'],
+                datasets: [{
+                    label: 'Count',
+                    data: barChartData,
+                    backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc'],
+                    borderColor: ['#4e73df', '#1cc88a', '#36b9cc'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: { beginAtZero: true }
+                }
             }
         });
+
+        // Create the Doughnut Chart
+        const doughnutCtx = document.getElementById("doughnutChart").getContext("2d");
+        doughnutChartInstance = new Chart(doughnutCtx, {
+            type: 'doughnut',
+            data: {
+                labels: doughnutChartData.map(item => item._id), // Category names
+                datasets: [{
+                    label: 'Revenue by Category',
+                    data: doughnutChartData.map(item => item.totalRevenue), // Revenue values
+                    backgroundColor: ['#ff6384', '#36a2eb', '#cc65fe', '#ffce56'],
+                    hoverBackgroundColor: ['#ff6384', '#36a2eb', '#cc65fe', '#ffce56']
+                }]
+            },
+            options: {
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(tooltipItem) {
+                                const category = doughnutChartData[tooltipItem.dataIndex];
+                                return `${category._id}: Revenue $${category.totalRevenue}, Orders: ${category.totalOrders}`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+    } catch (error) {
+        console.error('Error fetching chart data:', error);
+    }
+}
+
     </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            new Swiper('.swiper-container', {
+                slidesPerView: 4,
+                spaceBetween: 20,
+                navigation: {
+                    nextEl: '.swiper-button-next',
+                    prevEl: '.swiper-button-prev',
+                },
+                breakpoints: {
+                    768: {
+                        slidesPerView: 2
+                    },
+                    992: {
+                        slidesPerView: 3
+                    },
+                    1200: {
+                        slidesPerView: 4
+                    }
+                }
+            });
+        });
+    </script>
+    
+    
+
+  
 </body>
 
 </html>

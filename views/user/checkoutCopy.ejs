@@ -1,379 +1,538 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Checkout - FurniNest</title>
-  
+
     <!-- SweetAlert2 CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css"
+    />
     <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
     <style>
-        /* General Styles */
-       
-       
-        .checkout {
-            /* margin-top: 60px; */
-            margin-bottom: 30px;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            background-color: #ffffff;
-        }
-        
-        /* Coupon Section */
-        .coupon-section .toggle_info {
-           
-            background-color: #00dbf8;
-            border: 1px solid #0dcaf0;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 10px;
-            cursor: pointer;
-            transition: background-color 0.3s, border-color 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .coupon-section .toggle_info:hover {
-            background-color: #00dff4f3;
-            border-color: #0ab4d4;
-        }
-        .coupon-section .toggle_info i {
-            color: #0dcaf0;
-            font-size: 1.2rem;
-            margin-right: 8px;
-        }
-        .coupon-section .coupon-toggle {
-            color: #0dcaf0;
-            font-weight: bold;
-            text-decoration: underline;
-            transition: color 0.3s;
-        }
-        .coupon-section .coupon-toggle:hover {
-            color: #0ab4d4;
-            text-decoration: none;
-        }
-        .panel-collapse {
-            margin-top: 10px;
-            background-color: #f9f9f9;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-        .coupon-code {
-            color: #0dcaf0;
-            font-weight: 600;
-            font-size: 1rem;
-            cursor: pointer;
-        }
-        .coupon-code:hover {
-            color: #0ab4d4;
-            text-decoration: underline;
-        }
-        
-        /* Address Box */
+      /* General Styles */
+
+      .checkout {
+        /* margin-top: 60px; */
+        margin-bottom: 30px;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        background-color: #ffffff;
+      }
+
+      /* Coupon Section */
+      .coupon-section .toggle_info {
+        background-color: #00dbf8;
+        border: 1px solid #0dcaf0;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 10px;
+        cursor: pointer;
+        transition: background-color 0.3s, border-color 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .coupon-section .toggle_info:hover {
+        background-color: #00dff4f3;
+        border-color: #0ab4d4;
+      }
+      .coupon-section .toggle_info i {
+        color: #0dcaf0;
+        font-size: 1.2rem;
+        margin-right: 8px;
+      }
+      .coupon-section .coupon-toggle {
+        color: #0dcaf0;
+        font-weight: bold;
+        text-decoration: underline;
+        transition: color 0.3s;
+      }
+      .coupon-section .coupon-toggle:hover {
+        color: #0ab4d4;
+        text-decoration: none;
+      }
+      .panel-collapse {
+        margin-top: 10px;
+        background-color: #f9f9f9;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+      .coupon-code {
+        color: #0dcaf0;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+      }
+      .coupon-code:hover {
+        color: #0ab4d4;
+        text-decoration: underline;
+      }
+
+      /* Address Box */
+      .address-box {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 15px;
+        background-color: #f9f9f9;
+        cursor: pointer;
+        position: relative;
+        transition: border-color 0.3s;
+      }
+      .address-box:hover {
+        border-color: #0dcaf0;
+      }
+      .address-box input[type="radio"] {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+      }
+      .address-box label {
+        cursor: pointer;
+      }
+
+      /* Table Styling */
+      .table img {
+        width: 50px;
+        height: auto;
+      }
+
+      /* Order Summary Section */
+      .order-summary {
+        background-color: #fafafa;
+        border-radius: 8px;
+        padding: 20px;
+        margin-top: 30px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+      .order-summary h5 {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      /* Payment Options */
+      .form-check-label {
+        margin-left: 8px;
+        color: #333;
+      }
+
+      /* Button Styles */
+      .btn-success {
+        background-color: #28a745;
+        border: none;
+      }
+      .btn-success:hover {
+        background-color: #218838;
+      }
+      .btn-primary,
+      .btn-danger {
+        border-radius: 5px;
+      }
+      #delete-coupon-btn {
+        display: none; /* Hidden by default */
+      }
+
+      /* Responsive adjustments */
+      @media (max-width: 767.98px) {
         .address-box {
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 15px;
-            background-color: #f9f9f9;
-            cursor: pointer;
-            position: relative;
-            transition: border-color 0.3s;
+          padding: 10px;
         }
-        .address-box:hover {
-            border-color: #0dcaf0;
+        .coupon-section .toggle_info {
+          flex-direction: column;
+          align-items: flex-start;
         }
-        .address-box input[type="radio"] {
-            position: absolute;
-            top: 15px;
-            right: 15px;
+        .coupon-section .toggle_info span {
+          display: flex;
+          align-items: center;
         }
-        .address-box label {
-            cursor: pointer;
-        }
-
-        /* Table Styling */
-        .table img {
-            width: 50px;
-            height: auto;
-        }
-        
-        /* Order Summary Section */
-        .order-summary {
-            background-color: #fafafa;
-            border-radius: 8px;
-            padding: 20px;
-            margin-top: 30px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-        .order-summary h5 {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        
-        /* Payment Options */
-        .form-check-label {
-            margin-left: 8px;
-            color: #333;
-        }
-        
-        /* Button Styles */
-        .btn-success {
-            background-color: #28a745;
-            border: none;
-        }
-        .btn-success:hover {
-            background-color: #218838;
-        }
-        .btn-primary, .btn-danger {
-            border-radius: 5px;
-        }
-        #delete-coupon-btn {
-            display: none; /* Hidden by default */
-        }
-
-        /* Responsive adjustments */
-        @media (max-width: 767.98px) {
-            .address-box {
-                padding: 10px;
-            }
-            .coupon-section .toggle_info {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            .coupon-section .toggle_info span {
-                display: flex;
-                align-items: center;
-            }
-        }
+      }
     </style>
-</head>
-<body>
-
+  </head>
+  <body>
     <!-- Header Partial -->
     <%- include("../../views/partials/user/header") %>
 
     <!-- Breadcrumb -->
     <nav class="main-Shop" aria-label="breadcrumb">
-        <ol class="breadcrumb bg-light py-3 px-4">
-            <li class="breadcrumb-item"><a href="/" class="fw-bold text-primary">Home</a></li>
-            <li class="breadcrumb-item active text-secondary" aria-current="page"><span class="fw-semibold">Shop</span></li>
-        </ol>
+      <ol class="breadcrumb bg-light py-3 px-4">
+        <li class="breadcrumb-item">
+          <a href="/" class="fw-bold text-primary">Home</a>
+        </li>
+        <li class="breadcrumb-item active text-secondary" aria-current="page">
+          <span class="fw-semibold">Shop</span>
+        </li>
+      </ol>
     </nav>
 
     <!-- Coupon Management Section -->
-   
 
     <!-- Checkout Form -->
-    <form id="checkoutForm" action="/placeOrder" method="post" class="checkout-container">
-        <div class="row " style="width: 95%; justify-content: center; margin: 40px;">
-            <div class="row justify-content-center" style="margin-top: 30px;  margin-bottom:20px;  background-color: #f7f7f7;">
-                <!-- Available Coupons -->
-                <div class="col-md-8 col-lg-5 mb-3">
-                    <div class="toggle_info coupon-section">
-                        <span>
-                            <i class="fi-rs-user mr-10"></i>
-                            <span class="text-muted">Available Coupons?</span>
-                            <a href="#loginform" data-bs-toggle="collapse" class="collapsed coupon-toggle" aria-expanded="false">Click Here</a>
-                        </span>
-                    </div>
-                    <div class="panel-collapse collapse login_form" id="loginform">
-                        <table class="table table-borderless mt-2">
-                            <% for(let i = 0; i < coupon.length; i++) { %>
-                                <tr>
-                                    <td class="text-brand coupon-code">
-                                        <%= coupon[i].couponCode %>
-                                    </td>
-                                </tr>
-                            <% } %>
-                        </table>
-                    </div>
-                </div>
-        
-                <!-- Have a Coupon -->
-                <div class="col-md-8 col-lg-5 mb-3" >
-                    <div class="toggle_info" style="background-color: #29afc1; border: 1px solid #0dcaf0; border-radius: 8px; padding: 15px;">
-                        <span>
-                            <i class="fi-rs-label mr-10"></i>
-                            <span class="text-muted">Have a coupon?</span>
-                            <a href="#coupon" data-bs-toggle="collapse" class="collapsed" aria-expanded="false">Click here to enter your code</a>
-                        </span>
-                    </div>
-                    <div class="panel-collapse collapse coupon_form" id="coupon">
-                        <div class="panel-body">
-                            <p class="mb-3 font-sm">If you have a coupon code, please apply it below.</p>
-                            <span id="showcouponmessage" class="text-primary"></span>
-                            <div class="form-group">
-                                <input type="text" placeholder="Enter Coupon Code..." id="coupon-entered" class="form-control">
-                            </div>
-                            <div class="form-group mt-2">
-                                <button type="button" class="btn btn-primary" name="login" onclick="applyCoupon()">Apply Coupon</button>
-                                <button type="button" class="btn btn-danger ms-2" name="login" id="delete-coupon-btn" onclick="deleteCoupon()">Delete Coupon</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+    <form
+      id="checkoutForm"
+      action="/placeOrder"
+      method="post"
+      class="checkout-container"
+    >
+      <div
+        class="row"
+        style="width: 95%; justify-content: center; margin: 40px"
+      >
+        <div
+          class="row justify-content-center"
+          style="
+            margin-top: 30px;
+            margin-bottom: 20px;
+            background-color: #f7f7f7;
+          "
+        >
+          <!-- Available Coupons -->
+          <div class="col-md-8 col-lg-5 mb-3">
+            <div class="toggle_info coupon-section">
+              <span>
+                <i class="fi-rs-user mr-10"></i>
+                <span class="text-muted">Available Coupons?</span>
+                <a
+                  href="#loginform"
+                  data-bs-toggle="collapse"
+                  class="collapsed coupon-toggle"
+                  aria-expanded="false"
+                  >Click Here</a
+                >
+              </span>
             </div>
-            <!-- Address Selection Section -->
-            <div class="col-md-6"  style="border: 1px solid black; width: 500px; margin-bottom: 20px; border-radius: 20px;"  >
-                <h4 style="margin: 30px;" >Select an Address</h4>
-                <a style="margin-left: 30px;"  href="/addaddressForm?checkout=checkout"><button type="button" class="btn btn-secondary mt-2">Add Address</button></a>
-                <% addresses.forEach((address, index) => { %>
-                    <div class="address-box">
-                        <input type="radio" name="selectAddress" id="selectAddress" required value="<%= address._id %>" <%= index === 0 ? 'checked' : '' %>>
-                        <input type="hidden" id="selected-address-id" name="addressId" value="<%= addresses.length > 0 ? addresses[0]._id : '' %>">
-                        <label>
-                            <strong><%= address.fname %> <%= address.lname %></strong><br>
-                            <%= address.houseName %>, <%= address.city %>, <%= address.state %>, <%= address.pincode %><br>
-                            <%= address.phone %>
-                        </label>
-                    </div>
-                <% }); %>
-                <% if (!addresses || addresses.length === 0) { %>
-                    <p>No Address found</p>
+            <div class="panel-collapse collapse login_form" id="loginform">
+              <table class="table table-borderless mt-2">
+                <% for(let i = 0; i < coupon.length; i++) { %>
+                <tr>
+                  <td class="text-brand coupon-code">
+                    <%= coupon[i].couponCode %>
+                  </td>
+                </tr>
                 <% } %>
+              </table>
             </div>
+          </div>
 
-            <!-- Order Details Section -->
-            <div class="col-md-6" style="border: 1px solid black; width: 700px; border-radius: 20px;margin-left: 20px;margin-bottom: 20px;">
-                <h4 style="margin-left: 40px;margin-top: 30px;">Your Orders</h4>
-                <table class="table" style="margin-top: 25px;">
-                    <thead>
-                        <tr>
-                            <th>Image</th>
-                            <th>Name</th>
-                            <th>Quantity</th>
-                            <th>Total</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <% let subtotal = 0; %>
-                        <% user.cart.forEach(item => {
-                            const itemTotal = item.quantity * item.productId.salePrice;
-                            subtotal += itemTotal;
-                        %>
-                            <tr>
-                                <td><img src="/uploads/re-image/<%= item.productId.productImage[0] %>" alt="Product Image"></td>
-                                <td><%= item.productId.productName %></td>
-                                <td><%= item.quantity %></td>
-                                <td>Rs. <%= itemTotal.toFixed(2) %></td>
-                            </tr>
-                        <% }); %>
-                    </tbody>
-                </table>
+          <!-- Have a Coupon -->
+          <div class="col-md-8 col-lg-5 mb-3">
+            <div
+              class="toggle_info"
+              style="
+                background-color: #29afc1;
+                border: 1px solid #0dcaf0;
+                border-radius: 8px;
+                padding: 15px;
+              "
+            >
+              <span>
+                <i class="fi-rs-label mr-10"></i>
+                <span class="text-muted">Have a coupon?</span>
+                <a
+                  href="#coupon"
+                  data-bs-toggle="collapse"
+                  class="collapsed"
+                  aria-expanded="false"
+                  >Click here to enter your code</a
+                >
+              </span>
             </div>
-        </div>
-
-        <!-- Billing Summary and Payment Options -->
-        <div class="row" style="width: 35%; margin: 40px; border-radius: 20px; margin-left: 100px;">
-            <div class="col-md-12" style="width: 500px; margin-left: 20px;margin-bottom: 30px;">
-                <div class="order-summary">
-                    <h5>Order Summary</h5>
-                    <table class="table table-sm text-muted">
-                        <tbody>
-                            <tr>
-                                <th scope="row">Subtotal:</th>
-                                <td>Rs. <%= subtotal.toFixed(2) %></td>
-                            </tr>
-                            <input type="hidden" value="<%= subtotal.toFixed(2) %>" name="totalAmount" id="totalAmount">
-                            <tr>
-                                <th scope="row">Shipping Fees:</th>
-                                <td>Rs. <%= deliveryCharge %></td>
-                            </tr>
-                            <tr class="fw-bold">
-                                <th scope="row">Total:</th>
-                                <td id="finalAmount">Rs. <%= finalAmount %></td>
-                            </tr>
-                            <tr class="d-none" id="coupon-row">
-                                <th scope="row">Coupon Discount:</th>
-                                <td id="couponAmount">- Rs. 0</td>
-                            </tr>
-                        </tbody>
-                    </table>
-
-                    <!-- Hidden field to store applied coupon code -->
-                    <input type="hidden" name="couponSelected" id="appliedCouponCode">
-
-                    <!-- Payment Options -->
-                    <h6>Payment Options</h6>
-                    <%if(!isCodDisabled){%>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="payment_option" id="exampleRadios3"   value="Cash On Delivery" checked required>
-                        <label class="form-check-label" for="cod">Cash on Delivery</label>
-                    </div>
-                    <%}%>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="payment_option" id="exampleRadios5" value="Razorpay" required>
-                        <label class="form-check-label" for="exampleRadios5">Pay with Razorpay</label>
-                    </div>
-                    <div class="form-check " id="wallet-radio">
-                        <input class="form-check-input" type="radio" name="payment_option" id="exampleRadios6" value="Wallet">
-                        <label class="form-check-label" for="wallet">Wallet</label>
-                        <span class="text-success" id="walletMessage"></span>
-                    </div>
-
-                    <!-- Place Order Button -->
-                    <% if (addresses.length > 0) { %>
-                        <button type="submit" onclick="sweetAlert()" class="btn btn-fill-out btn-block mt-30" id="cashOnDeliveryButton">
-                            Place Order
-                        </button>
-
-                        <button type="button" id="rzp-button1" class="btn btn-fill-out btn-block mt-30" style="display: none;">
-                            Place Order
-                        </button>
-
-                        <button type="button" class="btn btn-fill-out btn-block mt-30" id="walletButton" style="display: none;">
-                            Place Order
-                        </button>
-                    <% } %>
-
-
-                    <script>
-                        // Add an event listener to the radio buttons to toggle button visibility
-                        document.querySelectorAll('input[name="payment_option"]').forEach(function (radio) {
-                            radio.addEventListener('change', function () {
-                                if (this.value === 'Cash On Delivery') {
-                                    document.getElementById('cashOnDeliveryButton').style.display = 'block';
-                                    document.getElementById('rzp-button1').style.display = 'none';
-                                    document.getElementById('walletButton').style.display = 'none';
-                                } else if (this.value === 'Razorpay') {
-                                    document.getElementById('cashOnDeliveryButton').style.display = 'none';
-                                    document.getElementById('walletButton').style.display = 'none';
-                                    document.getElementById('rzp-button1').style.display = 'block';
-                                } else if (this.value === 'Wallet') {
-                                    document.getElementById('cashOnDeliveryButton').style.display = 'none';
-                                    document.getElementById('walletButton').style.display = 'block';
-                                    document.getElementById('rzp-button1').style.display = 'none';
-                                }
-                            });
-                        });
-                    </script>
+            <div class="panel-collapse collapse coupon_form" id="coupon">
+              <div class="panel-body">
+                <p class="mb-3 font-sm">
+                  If you have a coupon code, please apply it below.
+                </p>
+                <span id="showcouponmessage" class="text-primary"></span>
+                <div class="form-group">
+                  <input
+                    type="text"
+                    placeholder="Enter Coupon Code..."
+                    id="coupon-entered"
+                    class="form-control"
+                  />
                 </div>
+                <div class="form-group mt-2">
+                  <button
+                    type="button"
+                    class="btn btn-primary"
+                    name="login"
+                    onclick="applyCoupon()"
+                  >
+                    Apply Coupon
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-danger ms-2"
+                    name="login"
+                    id="delete-coupon-btn"
+                    onclick="deleteCoupon()"
+                  >
+                    Delete Coupon
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Address Selection Section -->
+        <div
+          class="col-md-6"
+          style="
+            border: 1px solid black;
+            width: 500px;
+            margin-bottom: 20px;
+            border-radius: 20px;
+          "
+        >
+          <h4 style="margin: 30px">Select an Address</h4>
+          <a style="margin-left: 30px" href="/addaddressForm?checkout=checkout"
+            ><button type="button" class="btn btn-secondary mt-2">
+              Add Address
+            </button></a
+          >
+          <% addresses.forEach((address, index) => { %>
+          <div class="address-box">
+            <input type="radio" name="selectAddress" id="selectAddress" required
+            value="<%= address._id %>" <%= index === 0 ? 'checked' : '' %>>
+            <input
+              type="hidden"
+              id="selected-address-id"
+              name="addressId"
+              value="<%= addresses.length > 0 ? addresses[0]._id : '' %>"
+            />
+            <label>
+              <strong><%= address.fname %> <%= address.lname %></strong><br />
+              <%= address.houseName %>, <%= address.city %>, <%= address.state
+              %>, <%= address.pincode %><br />
+              <%= address.phone %>
+            </label>
+          </div>
+          <% }); %> <% if (!addresses || addresses.length === 0) { %>
+          <p>No Address found</p>
+          <% } %>
+        </div>
+
+        <!-- Order Details Section -->
+        <div
+          class="col-md-6"
+          style="
+            border: 1px solid black;
+            width: 700px;
+            border-radius: 20px;
+            margin-left: 20px;
+            margin-bottom: 20px;
+          "
+        >
+          <h4 style="margin-left: 40px; margin-top: 30px">Your Orders</h4>
+          <table class="table" style="margin-top: 25px">
+            <thead>
+              <tr>
+                <th>Image</th>
+                <th>Name</th>
+                <th>Quantity</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% let subtotal = 0; %> <% user.cart.forEach(item => { const
+              itemTotal = item.quantity * item.productId.salePrice; subtotal +=
+              itemTotal; %>
+              <tr>
+                <td>
+                  <img
+                    src="/uploads/re-image/<%= item.productId.productImage[0] %>"
+                    alt="Product Image"
+                  />
+                </td>
+                <td><%= item.productId.productName %></td>
+                <td><%= item.quantity %></td>
+                <td>Rs. <%= itemTotal.toFixed(2) %></td>
+              </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Billing Summary and Payment Options -->
+      <div
+        class="row"
+        style="
+          width: 35%;
+          margin: 40px;
+          border-radius: 20px;
+          margin-left: 100px;
+        "
+      >
+        <div
+          class="col-md-12"
+          style="width: 500px; margin-left: 20px; margin-bottom: 30px"
+        >
+          <div class="order-summary">
+            <h5>Order Summary</h5>
+            <table class="table table-sm text-muted">
+              <tbody>
+                <tr>
+                  <th scope="row">Subtotal:</th>
+                  <td>Rs. <%= subtotal.toFixed(2) %></td>
+                </tr>
+                <input
+                  type="hidden"
+                  value="<%= subtotal.toFixed(2) %>"
+                  name="totalAmount"
+                  id="totalAmount"
+                />
+                <tr>
+                  <th scope="row">Shipping Fees:</th>
+                  <td>Rs. <%= deliveryCharge %></td>
+                </tr>
+                <tr class="fw-bold">
+                  <th scope="row">Total:</th>
+                  <td id="finalAmount">Rs. <%= finalAmount %></td>
+                </tr>
+                <tr class="d-none" id="coupon-row">
+                  <th scope="row">Coupon Discount:</th>
+                  <td id="couponAmount">- Rs. 0</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <!-- Hidden field to store applied coupon code -->
+            <input type="hidden" name="couponSelected" id="appliedCouponCode" />
+
+            <!-- Payment Options -->
+            <h6>Payment Options</h6>
+            <%if(!isCodDisabled){%>
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="radio"
+                name="payment_option"
+                id="exampleRadios3"
+                value="Cash On Delivery"
+                checked
+                required
+              />
+              <label class="form-check-label" for="cod">Cash on Delivery</label>
+            </div>
+            <%}%>
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="radio"
+                name="payment_option"
+                id="exampleRadios5"
+                value="Razorpay"
+                required
+              />
+              <label class="form-check-label" for="exampleRadios5"
+                >Pay with Razorpay</label
+              >
+            </div>
+            <div class="form-check" id="wallet-radio">
+              <input
+                class="form-check-input"
+                type="radio"
+                name="payment_option"
+                id="exampleRadios6"
+                value="Wallet"
+              />
+              <label class="form-check-label" for="wallet">Wallet</label>
+              <span class="text-success" id="walletMessage"></span>
             </div>
 
+            <!-- Place Order Button -->
+            <% if (addresses.length > 0) { %>
+            <button
+              type="submit"
+              onclick="sweetAlert()"
+              class="btn btn-fill-out btn-block mt-30"
+              id="cashOnDeliveryButton"
+            >
+              Place Order
+            </button>
+
+            <button
+              type="button"
+              id="rzp-button1"
+              class="btn btn-fill-out btn-block mt-30"
+              style="display: none"
+            >
+              Place Order
+            </button>
+
+            <button
+              type="button"
+              class="btn btn-fill-out btn-block mt-30"
+              id="walletButton"
+              style="display: none"
+            >
+              Place Order
+            </button>
+            <% } %>
+
+            <script>
+              // Add an event listener to the radio buttons to toggle button visibility
+              document
+                .querySelectorAll('input[name="payment_option"]')
+                .forEach(function (radio) {
+                  radio.addEventListener("change", function () {
+                    if (this.value === "Cash On Delivery") {
+                      document.getElementById(
+                        "cashOnDeliveryButton"
+                      ).style.display = "block";
+                      document.getElementById("rzp-button1").style.display =
+                        "none";
+                      document.getElementById("walletButton").style.display =
+                        "none";
+                    } else if (this.value === "Razorpay") {
+                      document.getElementById(
+                        "cashOnDeliveryButton"
+                      ).style.display = "none";
+                      document.getElementById("walletButton").style.display =
+                        "none";
+                      document.getElementById("rzp-button1").style.display =
+                        "block";
+                    } else if (this.value === "Wallet") {
+                      document.getElementById(
+                        "cashOnDeliveryButton"
+                      ).style.display = "none";
+                      document.getElementById("walletButton").style.display =
+                        "block";
+                      document.getElementById("rzp-button1").style.display =
+                        "none";
+                    }
+                  });
+                });
+            </script>
+          </div>
         </div>
+      </div>
     </form>
     <script>
-        function sweetAlert() {
-            setTimeout(function () {
-                Swal.fire({
-                    icon: "success",
-                    title: "Order Placed",
-                    showConfirmButton: false,
-                    timer: 1500
-                });
-            }, 500);
-        }
+      function sweetAlert() {
+        setTimeout(function () {
+          Swal.fire({
+            icon: "success",
+            title: "Order Placed",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+        }, 500);
+      }
     </script>
 
     <!-- Footer Partial -->
-  
 
     <!-- Scripts -->
     <!-- SweetAlert2 JS -->
@@ -381,139 +540,158 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 
-
-
-    
-
-    
     <script>
-        async function applyCoupon() {
-            const couponCode = document.getElementById('coupon-entered').value.trim();
-            const totalAmount = parseFloat(document.getElementById('totalAmount').value);
+      async function applyCoupon() {
+        const couponCode = document
+          .getElementById("coupon-entered")
+          .value.trim();
+        const totalAmount = parseFloat(
+          document.getElementById("totalAmount").value
+        );
 
-            if (couponCode === "") {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Empty Coupon Code',
-                    text: 'Please enter a coupon code to apply.',
-                });
-                return;
-            }
-
-            try {
-                const response = await fetch(`/applyCoupon?couponCode=${encodeURIComponent(couponCode)}&totalAmount=${totalAmount}`, {
-                    method: "GET",
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                });
-
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    throw new Error(errorText || 'Failed to apply coupon');
-                }
-
-                const data = await response.json();
-
-                if (data.message === 'coupon Applied Successfully') {
-                    // Update the final amount
-                    document.getElementById('finalAmount').innerText = `Rs. ${data.finalPrice.toFixed(2)}`;
-                    // Update the coupon discount
-                    document.getElementById('couponAmount').innerText = `- Rs. ${data.couponAmount.toFixed(2)}`;
-                    // Show the coupon discount row
-                    document.getElementById('coupon-row').classList.remove('d-none');
-                    // Show the delete coupon button
-                    document.getElementById('delete-coupon-btn').style.display = 'inline-block';
-                    // Store the coupon code in hidden input
-                    document.getElementById('appliedCouponCode').value = couponCode;
-                    // Display success message
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Coupon Applied',
-                        text: data.message,
-                    });
-                } else {
-                    // Handle invalid coupon
-                    document.getElementById('showcouponmessage').innerText = data.message;
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Invalid Coupon',
-                        text: data.message,
-                    });
-                }
-            } catch (error) {
-                console.error('Error applying coupon:', error);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'There was an error applying the coupon. Please try again.',
-                });
-            }
+        if (couponCode === "") {
+          Swal.fire({
+            icon: "warning",
+            title: "Empty Coupon Code",
+            text: "Please enter a coupon code to apply.",
+          });
+          return;
         }
 
-        async function deleteCoupon() {
-            const totalAmount = parseFloat(document.getElementById('totalAmount').value);
-
-            try {
-                const response = await fetch(`/deleteCoupon?totalAmount=${totalAmount}`, {
-                    method: "GET",
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                });
-
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    throw new Error(errorText || 'Failed to delete coupon');
-                }
-
-                const data = await response.json();
-
-                if (data.message === 'Coupon Deleted Successfully') {
-                    // Reset the final amount
-                    document.getElementById('finalAmount').innerText = `Rs. ${data.finalPrice.toFixed(2)}`;
-                    // Hide the coupon discount row
-                    document.getElementById('coupon-row').classList.add('d-none');
-                    // Hide the delete coupon button
-                    document.getElementById('delete-coupon-btn').style.display = 'none';
-                    // Reset the hidden coupon code input
-                    document.getElementById('appliedCouponCode').value = '';
-                    // Clear the coupon message
-                    document.getElementById('showcouponmessage').innerText = '';
-                    // Clear the coupon discount amount
-                    document.getElementById('couponAmount').innerText = '';
-                    // Display info message
-                    Swal.fire({
-                        icon: 'info',
-                        title: 'Coupon Deleted',
-                        text: data.message,
-                    });
-                }
-            } catch (error) {
-                console.error('Error deleting coupon:', error);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'There was an error deleting the coupon. Please try again.',
-                });
+        try {
+          const response = await fetch(
+            `/applyCoupon?couponCode=${encodeURIComponent(
+              couponCode
+            )}&totalAmount=${totalAmount}`,
+            {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+              },
             }
-        }
+          );
 
-        // SweetAlert confirmation on form submit
-        document.getElementById('checkoutForm').addEventListener('submit', function(event) {
-            event.preventDefault();
+          if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(errorText || "Failed to apply coupon");
+          }
+
+          const data = await response.json();
+
+          if (data.message === "coupon Applied Successfully") {
+            // Update the final amount
+            document.getElementById(
+              "finalAmount"
+            ).innerText = `Rs. ${data.finalPrice.toFixed(2)}`;
+            // Update the coupon discount
+            document.getElementById(
+              "couponAmount"
+            ).innerText = `- Rs. ${data.couponAmount.toFixed(2)}`;
+            // Show the coupon discount row
+            document.getElementById("coupon-row").classList.remove("d-none");
+            // Show the delete coupon button
+            document.getElementById("delete-coupon-btn").style.display =
+              "inline-block";
+            // Store the coupon code in hidden input
+            document.getElementById("appliedCouponCode").value = couponCode;
+            // Display success message
             Swal.fire({
-                title: 'Confirm Order Placement',
-                text: 'Are you sure you want to place the order?',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: 'Yes, Place Order',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    this.submit();
-                }
+              icon: "success",
+              title: "Coupon Applied",
+              text: data.message,
             });
+          } else {
+            // Handle invalid coupon
+            document.getElementById("showcouponmessage").innerText =
+              data.message;
+            Swal.fire({
+              icon: "error",
+              title: "Invalid Coupon",
+              text: data.message,
+            });
+          }
+        } catch (error) {
+          console.error("Error applying coupon:", error);
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "There was an error applying the coupon. Please try again.",
+          });
+        }
+      }
+
+      async function deleteCoupon() {
+        const totalAmount = parseFloat(
+          document.getElementById("totalAmount").value
+        );
+
+        try {
+          const response = await fetch(
+            `/deleteCoupon?totalAmount=${totalAmount}`,
+            {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          );
+
+          if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(errorText || "Failed to delete coupon");
+          }
+
+          const data = await response.json();
+
+          if (data.message === "Coupon Deleted Successfully") {
+            // Reset the final amount
+            document.getElementById(
+              "finalAmount"
+            ).innerText = `Rs. ${data.finalPrice.toFixed(2)}`;
+            // Hide the coupon discount row
+            document.getElementById("coupon-row").classList.add("d-none");
+            // Hide the delete coupon button
+            document.getElementById("delete-coupon-btn").style.display = "none";
+            // Reset the hidden coupon code input
+            document.getElementById("appliedCouponCode").value = "";
+            // Clear the coupon message
+            document.getElementById("showcouponmessage").innerText = "";
+            // Clear the coupon discount amount
+            document.getElementById("couponAmount").innerText = "";
+            // Display info message
+            Swal.fire({
+              icon: "info",
+              title: "Coupon Deleted",
+              text: data.message,
+            });
+          }
+        } catch (error) {
+          console.error("Error deleting coupon:", error);
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "There was an error deleting the coupon. Please try again.",
+          });
+        }
+      }
+
+      // SweetAlert confirmation on form submit
+      document
+        .getElementById("checkoutForm")
+        .addEventListener("submit", function (event) {
+          event.preventDefault();
+          Swal.fire({
+            title: "Confirm Order Placement",
+            text: "Are you sure you want to place the order?",
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonText: "Yes, Place Order",
+          }).then((result) => {
+            if (result.isConfirmed) {
+              this.submit();
+            }
+          });
         });
     </script>
-</body>
+  </body>
 </html>
